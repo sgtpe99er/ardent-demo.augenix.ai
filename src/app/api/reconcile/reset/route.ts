@@ -23,6 +23,7 @@ export async function POST() {
   const admin = supabaseAdminClient;
 
   // Order matters: children first (FK cascade would also handle this, but be explicit).
+  await admin.from('aa_demo_human_overrides').delete().gte('id', 0);
   await admin.from('aa_demo_audit_logs').delete().gte('id', 0);
   await admin.from('aa_demo_reconciliation_matches').delete().gte('id', 0);
   await admin.from('aa_demo_reconciliation_batches').delete().gte('id', 0);

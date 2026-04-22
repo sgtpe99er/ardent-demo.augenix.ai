@@ -27,35 +27,45 @@ export default async function ReconcileBatchPage({ params }: PageProps) {
 
   if (!batch) notFound();
 
-  const [{ data: statementRaw }, { data: invoicesRaw }, { data: matchesRaw }, { data: auditRaw }] =
-    await Promise.all([
-      supabase
-        .from('aa_demo_statements' as never)
-        .select('*')
-        .eq('vendor_id', batch.vendor_id)
-        .lte('statement_period_start', batch.period_end)
-        .gte('statement_period_end', batch.period_start)
-        .order('statement_period_end', { ascending: false })
-        .limit(1)
-        .maybeSingle<any>(),
-      supabase
-        .from('aa_demo_invoices' as never)
-        .select('*')
-        .eq('vendor_id', batch.vendor_id)
-        .gte('invoice_date', batch.period_start)
-        .lte('invoice_date', batch.period_end)
-        .order('invoice_date', { ascending: true }),
-      supabase
-        .from('aa_demo_reconciliation_matches' as never)
-        .select('*')
-        .eq('batch_id', id)
-        .order('invoice_number', { ascending: true }),
-      supabase
-        .from('aa_demo_audit_logs' as never)
-        .select('id, run_label, model, duration_ms, created_at, raw_output')
-        .eq('batch_id', id)
-        .order('created_at', { ascending: true }),
-    ]);
+  const [
+    { data: statementRaw },
+    { data: invoicesRaw },
+    { data: matchesRaw },
+    { data: auditRaw },
+    { data: overridesRaw },
+  ] = await Promise.all([
+    supabase
+      .from('aa_demo_statements' as never)
+      .select('*')
+      .eq('vendor_id', batch.vendor_id)
+      .lte('statement_period_start', batch.period_end)
+      .gte('statement_period_end', batch.period_start)
+      .order('statement_period_end', { ascending: false })
+      .limit(1)
+      .maybeSingle<any>(),
+    supabase
+      .from('aa_demo_invoices' as never)
+      .select('*')
+      .eq('vendor_id', batch.vendor_id)
+      .gte('invoice_date', batch.period_start)
+      .lte('invoice_date', batch.period_end)
+      .order('invoice_date', { ascending: true }),
+    supabase
+      .from('aa_demo_reconciliation_matches' as never)
+      .select('*')
+      .eq('batch_id', id)
+      .order('invoice_number', { ascending: true }),
+    supabase
+      .from('aa_demo_audit_logs' as never)
+      .select('id, run_label, model, duration_ms, created_at, raw_output')
+      .eq('batch_id', id)
+      .order('created_at', { ascending: true }),
+    supabase
+      .from('aa_demo_human_overrides' as never)
+      .select('*')
+      .eq('batch_id', id)
+      .order('created_at', { ascending: true }),
+  ]);
 
   return (
     <ReconcileClient
@@ -104,6 +114,17 @@ export default async function ReconcileBatchPage({ params }: PageProps) {
         duration_ms: a.duration_ms,
         created_at: a.created_at,
         raw_output: a.raw_output,
+      }))}
+      overrides={((overridesRaw ?? []) as any[]).map((o) => ({
+        id: o.id,
+        invoice_number: o.invoice_number,
+        user_email: o.user_email,
+        previous_status: o.previous_status,
+        new_status: o.new_status,
+        previous_reasoning: o.previous_reasoning,
+        new_reasoning: o.new_reasoning,
+        note: o.note,
+        created_at: o.created_at,
       }))}
     />
   );
