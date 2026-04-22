@@ -50,7 +50,7 @@ export function DashboardLayoutClient({ children, businessName, userEmail, imper
     <nav className='-mx-3 flex flex-col gap-1 lg:-mx-4'>
       <Link href='/dashboard' className={sidebarItemClass(pathname === '/dashboard')}>
         <IoGlobe className='h-4 w-4 shrink-0' aria-hidden='true' />
-        <span>Dashboard</span>
+        <span>Reconciliation</span>
       </Link>
     </nav>
   );
@@ -94,7 +94,7 @@ export function DashboardLayoutClient({ children, businessName, userEmail, imper
                   <SheetClose asChild>
                     <Link href='/dashboard' className={sidebarItemClass(pathname === '/dashboard')}>
                       <IoGlobe className='h-4 w-4 shrink-0' aria-hidden='true' />
-                      <span>Dashboard</span>
+                      <span>Reconciliation</span>
                     </Link>
                   </SheetClose>
                 </nav>
@@ -109,7 +109,7 @@ export function DashboardLayoutClient({ children, businessName, userEmail, imper
                   <SheetClose asChild>
                     <Link href='/dashboard' className={sidebarItemClass(false)}>
                       <IoGridOutline className='h-4 w-4 shrink-0' />
-                      <span>Dashboard</span>
+                      <span>Reconciliation</span>
                     </Link>
                   </SheetClose>
                   <button
