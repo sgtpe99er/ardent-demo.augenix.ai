@@ -101,23 +101,33 @@ async function callGateway(params: {
   if (params.system) messages.push({ role: 'system', content: params.system });
   messages.push({ role: 'user', content: params.user });
 
+  // Only OpenAI + Anthropic-family models reliably accept
+  // response_format: { type: 'json_object' }. xAI Grok and Google Gemini
+  // reject it via the Vercel AI Gateway; for those we rely on prompt-enforced
+  // JSON and the fence-stripping parseJson helper.
+  const supportsJsonMode = /^(openai|anthropic)\//.test(params.model);
+
+  const body: Record<string, unknown> = {
+    model: params.model,
+    messages,
+    temperature: params.temperature ?? 0.2,
+  };
+  if (supportsJsonMode) {
+    body.response_format = { type: 'json_object' };
+  }
+
   const response = await fetch(`${AI_GATEWAY_BASE_URL}/chat/completions`, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${AI_GATEWAY_API_KEY}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      model: params.model,
-      messages,
-      temperature: params.temperature ?? 0.2,
-      response_format: { type: 'json_object' },
-    }),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`AI Gateway ${response.status}: ${body}`);
+    const errText = await response.text();
+    throw new Error(`AI Gateway ${response.status} (${params.model}): ${errText}`);
   }
 
   const data = (await response.json()) as {
