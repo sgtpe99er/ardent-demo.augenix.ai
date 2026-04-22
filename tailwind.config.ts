@@ -75,6 +75,7 @@ const config: Config = {
         sans: ['var(--font-montserrat)', ...fontFamily.sans],
         alt: ['var(--font-montserrat-alternates)'],
         logo: ['var(--font-poppins)'],
+        serif: ['var(--font-newsreader)', ...fontFamily.serif],
       },
       keyframes: {
         'accordion-down': {

@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'react';
 import type { Metadata } from 'next';
 import Script from 'next/script';
-import { Montserrat, Montserrat_Alternates, Poppins } from 'next/font/google';
+import { Montserrat, Montserrat_Alternates, Poppins, Newsreader } from 'next/font/google';
 import { ThemeInitScript } from '@/components/theme-init-script';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/utils/cn';
@@ -34,6 +34,14 @@ const poppins = Poppins({
   preload: false,
 });
 
+const newsreader = Newsreader({
+  variable: '--font-newsreader',
+  weight: ['300', '400', '500'],
+  style: ['normal', 'italic'],
+  subsets: ['latin'],
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
   title: 'Ardent Advisors AI',
   description: 'Get a free professional website, logo, and branding guide for your small business. We handle everything — you just pay for hosting.',
@@ -51,7 +59,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
           />
         )}
       </head>
-      <body className={cn('font-sans antialiased', montserrat.variable, montserratAlternates.variable, poppins.variable)}>
+      <body className={cn('font-sans antialiased', montserrat.variable, montserratAlternates.variable, poppins.variable, newsreader.variable)}>
         <ThemeInitScript />
         {children}
         <Toaster />
