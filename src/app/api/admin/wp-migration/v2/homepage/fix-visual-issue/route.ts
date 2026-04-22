@@ -286,7 +286,7 @@ Rules:
 
     // Get customer's deployed website record
     const { data: website, error: websiteError } = await supabaseAdminClient
-      .from('deployed_websites')
+      .from('aa_demo_deployed_websites')
       .select('id, vercel_project_id, github_repo_name, subdomain, site_slug')
       .eq('user_id', job.customer_id)
       .order('created_at', { ascending: false })

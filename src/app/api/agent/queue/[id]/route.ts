@@ -35,7 +35,7 @@ export async function PATCH(
 
   // Fetch current item for retry logic and notification
   const { data: item, error: fetchError } = await supabaseAdminClient
-    .from('async_requests')
+    .from('aa_demo_async_requests')
     .select('id, status, task_type, user_id, retry_count, max_retries')
     .eq('id', id)
     .single();
@@ -69,7 +69,7 @@ export async function PATCH(
   }
 
   const { data: updated, error: updateError } = await supabaseAdminClient
-    .from('async_requests')
+    .from('aa_demo_async_requests')
     .update(updateData as never)
     .eq('id', id)
     .select()
@@ -112,7 +112,7 @@ export async function PATCH(
     // Mark the edit_request as completed
     if (editRequestId) {
       await supabaseAdminClient
-        .from('edit_requests')
+        .from('aa_demo_edit_requests')
         .update({ status: 'completed', completed_at: now, updated_at: now } as never)
         .eq('id', editRequestId);
     }
@@ -124,12 +124,12 @@ export async function PATCH(
         const userEmail = userData?.user?.email;
         if (userEmail) {
           const { data: businessData } = await supabaseAdminClient
-            .from('businesses')
+            .from('aa_demo_businesses')
             .select('name, domain_name')
             .eq('user_id', userId)
             .maybeSingle();
           const { data: deployedData } = await supabaseAdminClient
-            .from('deployed_websites')
+            .from('aa_demo_deployed_websites')
             .select('subdomain, prod_url, custom_domain')
             .eq('user_id', userId)
             .maybeSingle();

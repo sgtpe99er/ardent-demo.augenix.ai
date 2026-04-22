@@ -13,7 +13,7 @@ export default async function DashboardPage() {
   const supabase = await createSupabaseServerClient();
 
   const { data: businessRaw } = await supabase
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('*')
     .eq('user_id', userId)
     .maybeSingle();
@@ -27,15 +27,15 @@ export default async function DashboardPage() {
     { data: selectionRaw },
     { data: feedbackRaw },
   ] = await Promise.all([
-    supabase.from('deployed_websites').select('*').eq('user_id', userId).maybeSingle(),
+    supabase.from('aa_demo_deployed_websites').select('*').eq('user_id', userId).maybeSingle(),
     supabase
-      .from('subscriptions')
+      .from('aa_demo_subscriptions')
       .select('id, status, current_period_end')
       .eq('user_id', userId)
       .in('status', ['active', 'trialing'])
       .maybeSingle(),
     supabase
-      .from('hosting_payments')
+      .from('aa_demo_hosting_payments')
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false }),

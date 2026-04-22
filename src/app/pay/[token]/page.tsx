@@ -25,7 +25,7 @@ export default async function PayTokenPage({ params }: { params: Promise<{ token
 
   // Fetch business name if available
   const { data: business } = await supabaseAdminClient
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('business_name')
     .eq('user_id', l.user_id)
     .maybeSingle();

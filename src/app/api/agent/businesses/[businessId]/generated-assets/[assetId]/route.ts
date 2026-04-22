@@ -33,7 +33,7 @@ export async function PATCH(
 
   // Fetch existing asset record
   const { data: asset, error: assetError } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .select('id, user_id, asset_type, storage_url, metadata, status')
     .eq('id', assetId)
     .single();
@@ -106,7 +106,7 @@ export async function PATCH(
   // ── 3. Update asset record ────────────────────────────────────────────────
 
   const { data: updatedAsset, error: updateError } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .update({
       storage_url: publicUrl,
       status: 'ready',

@@ -6,7 +6,7 @@ import { sendEmail } from '@/libs/email/mailer';
 async function getAuthorizedBusiness(businessId: string, userId: string) {
   const supabase = await createSupabaseServerClient();
   const { data: business, error } = await supabase
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('*')
     .eq('id', businessId)
     .eq('user_id', userId)
@@ -36,7 +36,7 @@ export async function GET(
   }
 
   const { data: brandAssets } = await supabase
-    .from('brand_assets')
+    .from('aa_demo_brand_assets')
     .select('*')
     .eq('user_id', session.user.id)
     .maybeSingle();
@@ -172,7 +172,7 @@ export async function PATCH(
     if (Object.keys(businessUpdates).length > 0) {
       businessUpdates.updated_at = new Date().toISOString();
       const { error: businessError } = await supabase
-        .from('businesses')
+        .from('aa_demo_businesses')
         .update(businessUpdates as never)
         .eq('id', businessId)
         .eq('user_id', session.user.id);
@@ -197,14 +197,14 @@ export async function PATCH(
       brandAssetUpdates.updated_at = new Date().toISOString();
 
       const { data: existingBrandAsset } = await supabase
-        .from('brand_assets')
+        .from('aa_demo_brand_assets')
         .select('id')
         .eq('user_id', session.user.id)
         .maybeSingle();
 
       if (existingBrandAsset) {
         const { error: brandAssetError } = await supabase
-          .from('brand_assets')
+          .from('aa_demo_brand_assets')
           .update(brandAssetUpdates as never)
           .eq('user_id', session.user.id);
 
@@ -213,7 +213,7 @@ export async function PATCH(
         }
       } else {
         const { error: brandAssetError } = await supabase
-          .from('brand_assets')
+          .from('aa_demo_brand_assets')
           .insert({
             user_id: session.user.id,
             business_id: businessId,

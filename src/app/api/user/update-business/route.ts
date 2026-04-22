@@ -25,7 +25,7 @@ export async function PATCH(req: NextRequest) {
 
   const db = supabaseAdminClient as any;
   const { error } = await db
-    .from('businesses')
+    .from('aa_demo_businesses')
     .update({ ...parsed.data, updated_at: new Date().toISOString() })
     .eq('user_id', session.user.id);
 

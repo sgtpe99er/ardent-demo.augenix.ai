@@ -31,7 +31,7 @@ export async function POST(
 
   // Get business info
   const { data: business, error: bizError } = await db
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('user_id')
     .eq('id', businessId)
     .single();
@@ -52,7 +52,7 @@ export async function POST(
 
   // 2. Get all logo asset IDs so we can delete related feedback
   const { data: logoAssets } = await db
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .select('id')
     .eq('business_id', businessId)
     .eq('asset_type', 'logo');
@@ -69,14 +69,14 @@ export async function POST(
 
   // 4. Delete all logo generated_assets for this business
   await db
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .delete()
     .eq('business_id', businessId)
     .eq('asset_type', 'logo');
 
   // 5. Create 3 'generating' placeholder records so the UI shows a loading state
   const VARIANTS = ['icon_text', 'wordmark', 'stylistic'];
-  await db.from('generated_assets').insert(
+  await db.from('aa_demo_generated_assets').insert(
     VARIANTS.map((variant) => ({
       user_id: userId,
       business_id: businessId,

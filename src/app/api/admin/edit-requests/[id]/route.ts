@@ -38,13 +38,13 @@ export async function PATCH(
 
     // Fetch the full edit request before updating (need user_id + description)
     const { data: editRequest } = await supabase
-      .from('edit_requests')
+      .from('aa_demo_edit_requests')
       .select('user_id, request_description, complexity, website_url')
       .eq('id', requestId)
       .single();
 
     const { error } = await supabase
-      .from('edit_requests')
+      .from('aa_demo_edit_requests')
       .update(updateData as unknown as never)
       .eq('id', requestId);
 
@@ -58,12 +58,12 @@ export async function PATCH(
       const userId = (editRequest as any).user_id;
       const { data: authUser } = await supabaseAdminClient.auth.admin.getUserById(userId);
       const { data: business } = await supabaseAdminClient
-        .from('businesses')
+        .from('aa_demo_businesses')
         .select('business_name')
         .eq('user_id', userId)
         .maybeSingle();
       const { data: deployedWebsite } = await supabaseAdminClient
-        .from('deployed_websites')
+        .from('aa_demo_deployed_websites')
         .select('live_url')
         .eq('user_id', userId)
         .maybeSingle();

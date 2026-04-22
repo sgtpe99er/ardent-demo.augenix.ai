@@ -19,7 +19,7 @@ export async function GET(
   const { businessId } = await params;
 
   const { data: business, error: businessError } = await supabaseAdminClient
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('user_id')
     .eq('id', businessId)
     .single();
@@ -31,7 +31,7 @@ export async function GET(
   const userId = (business as { user_id: string }).user_id;
 
   const { data: brandAssets, error } = await supabaseAdminClient
-    .from('brand_assets')
+    .from('aa_demo_brand_assets')
     .select('*')
     .eq('user_id', userId)
     .maybeSingle();

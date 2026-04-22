@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
   try {
     // 1. Insert a provisioning record immediately so the UI can show progress
     const { data: website, error: insertError } = await supabaseAdmin
-      .from('deployed_websites')
+      .from('aa_demo_deployed_websites')
       .insert({
         user_id,
         business_id,
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
     const repo = await createRepoFromTemplate(repoName);
 
     await supabaseAdmin
-      .from('deployed_websites')
+      .from('aa_demo_deployed_websites')
       .update({ github_repo_name: repo.name, github_repo_url: repo.html_url })
       .eq('id', website.id);
 
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
     const vercelProject = await createProject(repoName, repoName);
 
     await supabaseAdmin
-      .from('deployed_websites')
+      .from('aa_demo_deployed_websites')
       .update({ vercel_project_id: vercelProject.id })
       .eq('id', website.id);
 
@@ -143,7 +143,7 @@ export async function POST(req: NextRequest) {
     }
 
     await supabaseAdmin
-      .from('deployed_websites')
+      .from('aa_demo_deployed_websites')
       .update({
         status: 'building',
         dev_url: `https://${subdomain}`,

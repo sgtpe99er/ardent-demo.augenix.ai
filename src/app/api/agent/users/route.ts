@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
   if (existingUser) {
     // Fetch their business and deployed_websites to return full data
     let { data: business } = await supabaseAdminClient
-      .from('businesses')
+      .from('aa_demo_businesses')
       .select('id, business_name')
       .eq('user_id', existingUser.id)
       .single();
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     // Auth user exists but CRM records are missing — recover from partial creation failure
     if (!business) {
       const { data: newBusiness } = await supabaseAdminClient
-        .from('businesses')
+        .from('aa_demo_businesses')
         .insert({
           user_id: existingUser.id,
           business_name: businessName || null,
@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
 
   // Create business record
   const { data: business, error: bizError } = await supabaseAdminClient
-    .from('businesses')
+    .from('aa_demo_businesses')
     .insert({
       user_id: userId,
       business_name: businessName || null,

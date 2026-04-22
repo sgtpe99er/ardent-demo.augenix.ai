@@ -29,7 +29,7 @@ export async function POST(
 
   // Fetch current state first
   const { data: item, error: fetchError } = await supabaseAdminClient
-    .from('async_requests')
+    .from('aa_demo_async_requests')
     .select('id, status, retry_count, max_retries')
     .eq('id', id)
     .single();
@@ -49,7 +49,7 @@ export async function POST(
 
   // Atomic claim: only update if status is still 'pending'
   const { data: updated, error: updateError } = await supabaseAdminClient
-    .from('async_requests')
+    .from('aa_demo_async_requests')
     .update({
       status: 'claimed',
       claimed_by: agentId,

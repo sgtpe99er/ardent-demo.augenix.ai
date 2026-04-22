@@ -27,7 +27,7 @@ export async function POST(
 
   // Fetch the asset
   const { data: asset, error: fetchError } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .select('id, user_id, storage_url, metadata, asset_type')
     .eq('id', assetId)
     .single();
@@ -59,7 +59,7 @@ export async function POST(
 
   // Check if there's already a pending Canva task for this asset
   const { data: existingTask } = await supabaseAdminClient
-    .from('edit_requests')
+    .from('aa_demo_edit_requests')
     .select('id, status')
     .eq('target_page', `canva-design:${assetId}`)
     .in('status', ['pending', 'in_progress'])
@@ -71,7 +71,7 @@ export async function POST(
 
   // Get business name for the task description
   const { data: business } = await supabaseAdminClient
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('business_name')
     .eq('id', businessId)
     .maybeSingle();
@@ -82,7 +82,7 @@ export async function POST(
 
   // Create an edit_request task for the Paperclip agent
   const { data: task, error: insertError } = await supabaseAdminClient
-    .from('edit_requests')
+    .from('aa_demo_edit_requests')
     .insert({
       user_id: session.user.id,
       business_id: businessId,

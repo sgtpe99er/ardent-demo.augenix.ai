@@ -188,7 +188,7 @@ export async function POST(req: NextRequest) {
   const userId = session.user.id;
   const { step1, step2, step3, step4, step5, step6 } = parsed.data;
   const { data: existingBusinessRow } = await any
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('id')
     .eq('user_id', userId)
     .single();
@@ -197,7 +197,7 @@ export async function POST(req: NextRequest) {
   // Upsert businesses row (step1 + step2 domain + step3 + step6 fields)
   if (step1 || step2 || step3 || step6) {
     const industryValue = step1?.industry === 'other' ? step1.industryOther : step1?.industry;
-    const { data: savedBusiness, error } = await any.from('businesses').upsert(
+    const { data: savedBusiness, error } = await any.from('aa_demo_businesses').upsert(
       {
         user_id: userId,
         ...(step1 && {
@@ -256,7 +256,7 @@ export async function POST(req: NextRequest) {
 
   // Upsert brand_assets row (step2 socials + step4 brand + step5 uploads)
   if (step2 || step4 || step5) {
-    const { error } = await any.from('brand_assets').upsert({
+    const { error } = await any.from('aa_demo_brand_assets').upsert({
         user_id: userId,
         // Step 2: Online presence & socials
         ...(step2 && {
@@ -328,7 +328,7 @@ export async function POST(req: NextRequest) {
 
   if (step5?.uploadedAssets) {
     const { error: deleteInputsError } = await any
-      .from('customer_inputs')
+      .from('aa_demo_customer_inputs')
       .delete()
       .eq('user_id', userId)
       .eq('onboarding_step', 5);
@@ -358,7 +358,7 @@ export async function POST(req: NextRequest) {
       }));
 
       const { error: insertInputsError } = await any
-        .from('customer_inputs')
+        .from('aa_demo_customer_inputs')
         .insert(rows);
       if (insertInputsError) {
         console.error('[onboarding/save] customer_inputs insert error:', insertInputsError);
@@ -431,7 +431,7 @@ export async function POST(req: NextRequest) {
 
     if (savedBrandGuide?.id && step4?.brandGuideId !== savedBrandGuide.id) {
       await any
-        .from('brand_assets')
+        .from('aa_demo_brand_assets')
         .update({
           brand_guide_id: savedBrandGuide.id,
           updated_at: new Date().toISOString(),
@@ -442,7 +442,7 @@ export async function POST(req: NextRequest) {
 
   // Upsert domain_requests row (step4 legacy fields)
   if (step4) {
-    const { error } = await any.from('domain_requests').upsert({
+    const { error } = await any.from('aa_demo_domain_requests').upsert({
         user_id: userId,
         needs_domain: step4.needsDomain,
         requested_domain: step4.selectedDomain ?? step4.requestedDomain ?? null,
@@ -468,7 +468,7 @@ export async function POST(req: NextRequest) {
     }
     if (Object.keys(businessUpdate).length > 1) {
       const { error: bizError } = await any
-        .from('businesses')
+        .from('aa_demo_businesses')
         .update(businessUpdate)
         .eq('user_id', userId);
       if (bizError) {

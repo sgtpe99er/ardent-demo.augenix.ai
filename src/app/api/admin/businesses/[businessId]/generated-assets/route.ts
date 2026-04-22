@@ -27,7 +27,7 @@ export async function GET(
   const { businessId } = await params;
 
   const { data: assets, error } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .select('*')
     .eq('business_id', businessId)
     .order('created_at', { ascending: false });

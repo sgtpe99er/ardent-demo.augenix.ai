@@ -5,7 +5,7 @@ import { getSession } from '@/features/account/controllers/get-session';
 import { sendWelcomeEmail } from '@/features/emails/send-welcome';
 import type { Tables } from '@/libs/supabase/types';
 
-type Business = Tables<'businesses'>;
+type Business = Tables<'aa_demo_businesses'>;
 
 function generateSubdomain(name: string): string {
   const base = name
@@ -71,14 +71,14 @@ export async function POST(request: NextRequest) {
 
   // If admin role, insert into admin_users table
   if (role === 'admin') {
-    await supabaseAdminClient.from('admin_users').insert({
+    await supabaseAdminClient.from('aa_demo_admin_users').insert({
       user_id: userId,
     } as any);
   }
 
   // Create business record if any business data provided
   if (businessName || industry || locationCity) {
-    await supabaseAdminClient.from('businesses').insert({
+    await supabaseAdminClient.from('aa_demo_businesses').insert({
       user_id: userId,
       business_name: businessName || null,
       industry: industry || null,
@@ -144,8 +144,8 @@ export async function GET(request: NextRequest) {
       { data: adminUsers },
     ] = await Promise.all([
       supabaseAdminClient.auth.admin.listUsers({ perPage: 1000 }),
-      supabase.from('businesses').select('*'),
-      supabase.from('admin_users').select('user_id'),
+      supabase.from('aa_demo_businesses').select('*'),
+      supabase.from('aa_demo_admin_users').select('user_id'),
     ]);
 
     const adminUserIds = (adminUsers ?? []).map((a: any) => a.user_id as string);

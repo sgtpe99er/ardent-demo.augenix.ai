@@ -35,7 +35,7 @@ let mockSupabaseClient: ReturnType<typeof buildSupabaseMock>;
 function buildSupabaseMock() {
   return {
     from: vi.fn().mockImplementation((table: string) => {
-      if (table === 'deployed_websites') {
+      if (table === aa_demo_deployed_websites) {
         return {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({ maybeSingle: mockMaybeSingle }),
@@ -43,7 +43,7 @@ function buildSupabaseMock() {
           update: vi.fn().mockReturnValue({ eq: mockUpdateEq }),
         };
       }
-      if (table === 'businesses') {
+      if (table === aa_demo_businesses) {
         return {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({ maybeSingle: vi.fn().mockResolvedValue({ data: { business_name: 'Acme Co' }, error: null }) }),
@@ -170,7 +170,7 @@ describe('POST /api/webhooks/vercel', () => {
     await POST(makeRequest(body));
 
     // The update call should include a live_url starting with https://
-    const updateArg = mockSupabaseClient.from('deployed_websites').update as ReturnType<typeof vi.fn>;
+    const updateArg = mockSupabaseClient.from('aa_demo_deployed_websites').update as ReturnType<typeof vi.fn>;
     // We verify the update was called — detailed arg inspection via spy
     expect(mockUpdateEq).toHaveBeenCalled();
   });

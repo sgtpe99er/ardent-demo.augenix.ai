@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     // Get business data
     const { data: businessData } = await supabaseAdminClient
-      .from('businesses')
+      .from('aa_demo_businesses')
       .select('id, user_id, domain_name, domain_status')
       .eq('id', businessId)
       .single();
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     // Get Vercel project ID if deployed
     const { data: deployedSite } = await supabaseAdminClient
-      .from('deployed_websites')
+      .from('aa_demo_deployed_websites')
       .select('vercel_project_id')
       .eq('user_id', business.user_id)
       .maybeSingle();

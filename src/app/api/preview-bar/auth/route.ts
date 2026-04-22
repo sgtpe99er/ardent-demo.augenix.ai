@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
   if (!isAdmin) {
     // Verify the authenticated user owns this business
     const { data: business } = await supabaseAdminClient
-      .from('businesses')
+      .from('aa_demo_businesses')
       .select('id')
       .eq('id', website.business_id)
       .eq('user_id', session.user.id)

@@ -15,7 +15,7 @@ export async function POST() {
 
   // Get user's business
   const { data: business, error: bizError } = await db
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('id')
     .eq('user_id', userId)
     .maybeSingle();
@@ -36,7 +36,7 @@ export async function POST() {
 
   // 2. Get existing logo asset IDs for feedback cleanup
   const { data: logoAssets } = await db
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .select('id')
     .eq('user_id', userId)
     .eq('asset_type', 'logo');
@@ -49,11 +49,11 @@ export async function POST() {
   }
 
   // 4. Delete all logo generated_assets for this user
-  await db.from('generated_assets').delete().eq('user_id', userId).eq('asset_type', 'logo');
+  await db.from('aa_demo_generated_assets').delete().eq('user_id', userId).eq('asset_type', 'logo');
 
   // 5. Create 'generating' placeholder records so the UI shows a loading state
   const VARIANTS = ['icon_text', 'wordmark', 'stylistic'];
-  await db.from('generated_assets').insert(
+  await db.from('aa_demo_generated_assets').insert(
     VARIANTS.map((variant) => ({
       user_id: userId,
       business_id: businessId,

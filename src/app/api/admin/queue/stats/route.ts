@@ -15,7 +15,7 @@ export async function GET() {
 
   // Fetch all non-cancelled counts in one query
   const { data, error } = await supabaseAdminClient
-    .from('async_requests')
+    .from('aa_demo_async_requests')
     .select('status, created_at')
     .neq('status', 'cancelled');
 

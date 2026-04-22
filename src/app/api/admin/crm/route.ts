@@ -102,7 +102,7 @@ async function createUserForProspect(
     const userId = newUser.user.id;
 
     // Create business and deployed_websites records
-    await supabaseAdminClient.from('businesses').insert({
+    await supabaseAdminClient.from('aa_demo_businesses').insert({
       user_id: userId,
       business_name: businessName,
       status: 'onboarding',

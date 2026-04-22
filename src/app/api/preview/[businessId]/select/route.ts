@@ -31,7 +31,7 @@ export async function POST(
 
   // Verify user owns the business
   const { data: business } = await supabaseAdminClient
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('id')
     .eq('id', businessId)
     .eq('user_id', session.user.id)
@@ -62,7 +62,7 @@ export async function POST(
 
   // Fetch the deployed website for repo info
   const { data: website } = await supabaseAdminClient
-    .from('deployed_websites')
+    .from('aa_demo_deployed_websites')
     .select('id, github_repo_name')
     .eq('business_id', businessId)
     .order('created_at', { ascending: false })
@@ -101,7 +101,7 @@ export async function POST(
 
   // Mark the website as approved
   await supabaseAdminClient
-    .from('deployed_websites')
+    .from('aa_demo_deployed_websites')
     .update({
       approval_status: 'approved',
       status: 'pending_changes',

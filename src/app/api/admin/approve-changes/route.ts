@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
   // Fetch the website record to get the repo name
   const { data: website, error: fetchError } = await supabaseAdmin
-    .from('deployed_websites')
+    .from('aa_demo_deployed_websites')
     .select('github_repo_name, vercel_project_id')
     .eq('id', website_id)
     .single();
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
 
     // Mark as pending_changes → Vercel webhook will flip to 'deployed' on success
     await supabaseAdmin
-      .from('deployed_websites')
+      .from('aa_demo_deployed_websites')
       .update({
         status: 'pending_changes',
         approval_status: 'approved',

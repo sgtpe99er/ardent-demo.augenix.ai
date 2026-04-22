@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
   }
 
   const { data: assets, error } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .select('id, user_id, business_id, asset_type, storage_url, metadata, created_at')
     .eq('asset_type', 'logo')
     .eq('status', 'refreshing');

@@ -7,7 +7,7 @@ export async function GET() {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { data: assets, error } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .select('*')
     .eq('user_id', session.user.id)
     .order('created_at', { ascending: false });

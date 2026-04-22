@@ -2,7 +2,7 @@
 * USERS
 * Note: This table contains user data. Users should only be able to view and update their own data.
 */
-create table users (
+create table aa_demo_users (
   -- UUID from auth.users
   id uuid references auth.users not null primary key,
   full_name text,
@@ -12,9 +12,9 @@ create table users (
   -- Stores your customer's payment instruments.
   payment_method jsonb
 );
-alter table users enable row level security;
-create policy "Can view own user data." on users for select using (auth.uid() = id);
-create policy "Can update own user data." on users for update using (auth.uid() = id);
+alter table aa_demo_users enable row level security;
+create policy "Can view own user data." on aa_demo_users for select using (auth.uid() = id);
+create policy "Can update own user data." on aa_demo_users for update using (auth.uid() = id);
 
 /**
 * This trigger automatically creates a user entry when a new user signs up via Supabase Auth.
@@ -22,7 +22,7 @@ create policy "Can update own user data." on users for update using (auth.uid() 
 create function public.handle_new_user() 
 returns trigger as $$
 begin
-  insert into public.users (id, full_name, avatar_url)
+  insert into public.aa_demo_users (id, full_name, avatar_url)
   values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
   return new;
 end;
@@ -35,20 +35,20 @@ create trigger on_auth_user_created
 * CUSTOMERS
 * Note: this is a private table that contains a mapping of user IDs to Stripe customer IDs.
 */
-create table customers (
+create table aa_demo_customers (
   -- UUID from auth.users
   id uuid references auth.users not null primary key,
   -- The user's customer ID in Stripe. User must not be able to update this.
   stripe_customer_id text
 );
-alter table customers enable row level security;
+alter table aa_demo_customers enable row level security;
 -- No policies as this is a private table that the user must not have access to.
 
 /** 
 * PRODUCTS
 * Note: products are created and managed in Stripe and synced to our DB via Stripe webhooks.
 */
-create table products (
+create table aa_demo_products (
   -- Product ID from Stripe, e.g. prod_1234.
   id text primary key,
   -- Whether the product is currently available for purchase.
@@ -62,8 +62,8 @@ create table products (
   -- Set of key-value pairs, used to store additional information about the object in a structured format.
   metadata jsonb
 );
-alter table products enable row level security;
-create policy "Allow public read-only access." on products for select using (true);
+alter table aa_demo_products enable row level security;
+create policy "Allow public read-only access." on aa_demo_products for select using (true);
 
 /**
 * PRICES
@@ -71,11 +71,11 @@ create policy "Allow public read-only access." on products for select using (tru
 */
 create type pricing_type as enum ('one_time', 'recurring');
 create type pricing_plan_interval as enum ('day', 'week', 'month', 'year');
-create table prices (
+create table aa_demo_prices (
   -- Price ID from Stripe, e.g. price_1234.
   id text primary key,
   -- The ID of the prduct that this price belongs to.
-  product_id text references products, 
+  product_id text references aa_demo_products, 
   -- Whether the price can be used for new purchases.
   active boolean,
   -- A brief description of the price.
@@ -95,15 +95,15 @@ create table prices (
   -- Set of key-value pairs, used to store additional information about the object in a structured format.
   metadata jsonb
 );
-alter table prices enable row level security;
-create policy "Allow public read-only access." on prices for select using (true);
+alter table aa_demo_prices enable row level security;
+create policy "Allow public read-only access." on aa_demo_prices for select using (true);
 
 /**
 * SUBSCRIPTIONS
 * Note: subscriptions are created and managed in Stripe and synced to our DB via Stripe webhooks.
 */
 create type subscription_status as enum ('trialing', 'active', 'canceled', 'incomplete', 'incomplete_expired', 'past_due', 'unpaid', 'paused');
-create table subscriptions (
+create table aa_demo_subscriptions (
   -- Subscription ID from Stripe, e.g. sub_1234.
   id text primary key,
   user_id uuid references auth.users not null,
@@ -112,7 +112,7 @@ create table subscriptions (
   -- Set of key-value pairs, used to store additional information about the object in a structured format.
   metadata jsonb,
   -- ID of the price that created this subscription.
-  price_id text references prices,
+  price_id text references aa_demo_prices,
   -- Quantity multiplied by the unit amount of the price creates the amount of the subscription. Can be used to charge multiple seats.
   quantity integer,
   -- If true the subscription has been canceled by the user and will be deleted at the end of the billing period.
@@ -134,12 +134,12 @@ create table subscriptions (
   -- If the subscription has a trial, the end of that trial.
   trial_end timestamp with time zone default timezone('utc'::text, now())
 );
-alter table subscriptions enable row level security;
-create policy "Can only view own subs data." on subscriptions for select using (auth.uid() = user_id);
+alter table aa_demo_subscriptions enable row level security;
+create policy "Can only view own subs data." on aa_demo_subscriptions for select using (auth.uid() = user_id);
 
 /**
  * REALTIME SUBSCRIPTIONS
  * Only allow realtime listening on public tables.
  */
 drop publication if exists supabase_realtime;
-create publication supabase_realtime for table products, prices;
+create publication supabase_realtime for table aa_demo_products, aa_demo_prices;

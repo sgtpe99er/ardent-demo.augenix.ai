@@ -27,7 +27,7 @@ export async function DELETE(
   const { businessId, assetId } = await params;
 
   const { error } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .delete()
     .eq('id', assetId)
     .eq('business_id', businessId);

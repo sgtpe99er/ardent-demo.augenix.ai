@@ -29,11 +29,11 @@ export async function GET(request: NextRequest) {
       { data: pendingQueueItems },
       { data: hostingPayments }
     ] = await Promise.all([
-      supabase.from('businesses').select('status'),
+      supabase.from('aa_demo_businesses').select('status'),
       supabaseAdminClient.auth.admin.listUsers(),
-      supabase.from('edit_requests').select('status'),
-      supabase.from('async_requests').select('status').in('status', ['pending', 'claimed', 'processing']),
-      supabase.from('hosting_payments').select('total_amount, created_at, status')
+      supabase.from('aa_demo_edit_requests').select('status'),
+      supabase.from('aa_demo_async_requests').select('status').in('status', ['pending', 'claimed', 'processing']),
+      supabase.from('aa_demo_hosting_payments').select('total_amount, created_at, status')
     ]);
 
     // Calculate stats

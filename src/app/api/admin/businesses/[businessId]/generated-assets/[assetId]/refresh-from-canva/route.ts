@@ -29,7 +29,7 @@ export async function POST(
 
   // Fetch the asset record
   const { data: asset, error: assetError } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .select('id, metadata, status')
     .eq('id', assetId)
     .single();
@@ -51,7 +51,7 @@ export async function POST(
 
   // Mark asset as refreshing so the Logo Designer agent can pick it up
   const { error: updateError } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .update({
       status: 'refreshing',
       metadata: {

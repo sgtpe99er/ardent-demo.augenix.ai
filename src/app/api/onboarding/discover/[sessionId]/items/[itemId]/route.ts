@@ -27,7 +27,7 @@ export async function PATCH(
 
     // Check if user is admin
     const { data: adminUser } = await supabaseAdminClient
-      .from('admin_users')
+      .from('aa_demo_admin_users')
       .select('id')
       .eq('user_id', user.id)
       .single();

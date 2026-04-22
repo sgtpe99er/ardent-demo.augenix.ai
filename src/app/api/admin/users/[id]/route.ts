@@ -52,16 +52,16 @@ export async function PATCH(
     if (role === 'admin') {
       // Upsert into admin_users
       const { data: existing } = await supabaseAdminClient
-        .from('admin_users')
+        .from('aa_demo_admin_users')
         .select('id')
         .eq('user_id', userId)
         .maybeSingle();
       if (!existing) {
-        await supabaseAdminClient.from('admin_users').insert({ user_id: userId } as any);
+        await supabaseAdminClient.from('aa_demo_admin_users').insert({ user_id: userId } as any);
       }
     } else {
       // Remove from admin_users
-      await supabaseAdminClient.from('admin_users').delete().eq('user_id', userId);
+      await supabaseAdminClient.from('aa_demo_admin_users').delete().eq('user_id', userId);
     }
   }
 
@@ -81,7 +81,7 @@ export async function PATCH(
   if (Object.keys(businessUpdate).length > 0) {
     businessUpdate.updated_at = new Date().toISOString();
     await supabaseAdminClient
-      .from('businesses')
+      .from('aa_demo_businesses')
       .update(businessUpdate as any)
       .eq('user_id', userId);
   }

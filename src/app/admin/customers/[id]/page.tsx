@@ -25,34 +25,34 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
 
   // Fetch customer data (may be null for admin users with no business)
   const { data: business } = await supabase
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('*')
     .eq('user_id', id)
     .single();
 
   // Fetch onboarding responses
   const { data: onboardingResponses } = await supabase
-    .from('onboarding_responses')
+    .from('aa_demo_onboarding_responses')
     .select('*')
     .eq('user_id', id)
     .order('step', { ascending: true });
 
   // Fetch brand assets
   const { data: brandAssets } = await supabase
-    .from('brand_assets')
+    .from('aa_demo_brand_assets')
     .select('*')
     .eq('user_id', id)
     .single();
 
   // Fetch domain requests
   const { data: domainRequests } = await supabase
-    .from('domain_requests')
+    .from('aa_demo_domain_requests')
     .select('*')
     .eq('user_id', id);
 
   // Fetch generated assets
   const { data: generatedAssets } = await supabase
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .select('*')
     .eq('user_id', id)
     .order('created_at', { ascending: false });
@@ -66,21 +66,21 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
 
   // Fetch edit requests
   const { data: editRequests } = await supabase
-    .from('edit_requests')
+    .from('aa_demo_edit_requests')
     .select('*')
     .eq('user_id', id)
     .order('created_at', { ascending: false });
 
   // Fetch hosting payments
   const { data: hostingPayments } = await supabase
-    .from('hosting_payments')
+    .from('aa_demo_hosting_payments')
     .select('*')
     .eq('user_id', id)
     .order('created_at', { ascending: false });
 
   // Fetch deployed website
   const { data: deployedWebsite } = await supabase
-    .from('deployed_websites')
+    .from('aa_demo_deployed_websites')
     .select('*')
     .eq('user_id', id)
     .single();

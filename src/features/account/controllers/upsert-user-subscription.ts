@@ -23,7 +23,7 @@ export async function upsertUserSubscription({
 
   // Get customer's userId from mapping table.
   const { data: customerData, error: noCustomerError } = await supabaseAdminClient
-    .from('customers')
+    .from('aa_demo_customers')
     .select('id')
     .eq('stripe_customer_id', customerId)
     .single();
@@ -53,7 +53,7 @@ export async function upsertUserSubscription({
     trial_end: subscription.trial_end ? toDateTime(subscription.trial_end).toISOString() : null,
   };
 
-  const { error } = await supabaseAdminClient.from('subscriptions').upsert([subscriptionData]);
+  const { error } = await supabaseAdminClient.from('aa_demo_subscriptions').upsert([subscriptionData]);
   if (error) {
     throw error;
   }
@@ -80,7 +80,7 @@ const copyBillingDetailsToCustomer = async (userId: string, paymentMethod: Strip
   }
 
   const { error } = await supabaseAdminClient
-    .from('users')
+    .from('aa_demo_users')
     .update({
       billing_address: { ...address },
       payment_method: { ...paymentMethod[paymentMethod.type] },

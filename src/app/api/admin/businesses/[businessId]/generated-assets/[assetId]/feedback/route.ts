@@ -37,7 +37,7 @@ export async function POST(
 
   // Verify asset belongs to this business
   const { data: asset, error: assetError } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .select('id, feedback_round')
     .eq('id', assetId)
     .single();

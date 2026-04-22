@@ -115,7 +115,7 @@ async function handleHostingPayment(session: Stripe.Checkout.Session) {
 
   // Resolve userId from Stripe customer → customers table
   const { data: customerRow } = await db
-    .from('customers')
+    .from('aa_demo_customers')
     .select('id')
     .eq('stripe_customer_id', session.customer as string)
     .single();
@@ -149,7 +149,7 @@ async function handleHostingPayment(session: Stripe.Checkout.Session) {
 
   // Update business status + payment fields
   await db
-    .from('businesses')
+    .from('aa_demo_businesses')
     .update({
       status: 'assets_generating',
       payment_status: 'paid',
@@ -162,13 +162,13 @@ async function handleHostingPayment(session: Stripe.Checkout.Session) {
 
   // Fetch business + brand_assets for generation input
   const { data: business } = await db
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('id, business_name, industry, target_audience, services_products')
     .eq('user_id', userId)
     .single();
 
   const { data: brandAssets } = await db
-    .from('brand_assets')
+    .from('aa_demo_brand_assets')
     .select('has_existing_logo, existing_logo_url, has_brand_colors, brand_colors, style_preference, color_preference, existing_website_url')
     .eq('user_id', userId)
     .maybeSingle();
@@ -204,7 +204,7 @@ async function handleHostingPayment(session: Stripe.Checkout.Session) {
   if (pendingDomain && domainVercelPriceCents && business) {
     // Fetch the Vercel project ID if the site has been provisioned
     const { data: deployedSite } = await db
-      .from('deployed_websites')
+      .from('aa_demo_deployed_websites')
       .select('vercel_project_id')
       .eq('customer_id', userId)
       .maybeSingle();

@@ -49,7 +49,7 @@ export async function POST(
   // Fetch feedback_round + metadata for each asset
   const assetIds = feedbacks.map((f) => f.assetId);
   const { data: assets, error: assetsError } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .select('id, feedback_round, metadata')
     .in('id', assetIds);
 
@@ -89,7 +89,7 @@ export async function POST(
 
   if (dislikedAssetIds.length > 0) {
     const { error: rejectError } = await supabaseAdminClient
-      .from('generated_assets')
+      .from('aa_demo_generated_assets')
       .update({ status: 'rejected' })
       .in('id', dislikedAssetIds);
 
@@ -104,7 +104,7 @@ export async function POST(
 
   // Get the user_id for this business
   const { data: business } = await supabaseAdminClient
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('user_id')
     .eq('id', businessId)
     .single();
@@ -163,7 +163,7 @@ export async function POST(
         })),
       ];
 
-      await supabaseAdminClient.from('generated_assets').insert(placeholders as any);
+      await supabaseAdminClient.from('aa_demo_generated_assets').insert(placeholders as any);
 
       triggerLogoGeneration(businessId, {
         feedbackRound: currentRound,
@@ -184,7 +184,7 @@ export async function POST(
         metadata: { variant, generation_round: nextRound, generation_type: 'initial' },
       }));
 
-      await supabaseAdminClient.from('generated_assets').insert(placeholders as any);
+      await supabaseAdminClient.from('aa_demo_generated_assets').insert(placeholders as any);
 
       triggerLogoGeneration(businessId, {
         feedbackRound: currentRound,

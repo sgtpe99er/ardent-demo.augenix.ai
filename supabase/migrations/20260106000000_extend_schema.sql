@@ -2,7 +2,7 @@
  * BUSINESSES
  * Stores business information collected during onboarding
  */
-create table businesses (
+create table aa_demo_businesses (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users not null unique,
   business_name text,
@@ -18,37 +18,37 @@ create table businesses (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
-alter table businesses enable row level security;
-create policy "Users can view own business data." on businesses for select using (auth.uid() = user_id);
-create policy "Users can insert own business data." on businesses for insert with check (auth.uid() = user_id);
-create policy "Users can update own business data." on businesses for update using (auth.uid() = user_id);
+alter table aa_demo_businesses enable row level security;
+create policy "Users can view own business data." on aa_demo_businesses for select using (auth.uid() = user_id);
+create policy "Users can insert own business data." on aa_demo_businesses for insert with check (auth.uid() = user_id);
+create policy "Users can update own business data." on aa_demo_businesses for update using (auth.uid() = user_id);
 
 /**
  * ONBOARDING_RESPONSES
  * Stores detailed onboarding form responses including file references
  */
-create table onboarding_responses (
+create table aa_demo_onboarding_responses (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users not null,
-  business_id uuid references businesses,
+  business_id uuid references aa_demo_businesses,
   step integer not null,
   responses jsonb not null default '{}',
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
-alter table onboarding_responses enable row level security;
-create policy "Users can view own onboarding responses." on onboarding_responses for select using (auth.uid() = user_id);
-create policy "Users can insert own onboarding responses." on onboarding_responses for insert with check (auth.uid() = user_id);
-create policy "Users can update own onboarding responses." on onboarding_responses for update using (auth.uid() = user_id);
+alter table aa_demo_onboarding_responses enable row level security;
+create policy "Users can view own onboarding responses." on aa_demo_onboarding_responses for select using (auth.uid() = user_id);
+create policy "Users can insert own onboarding responses." on aa_demo_onboarding_responses for insert with check (auth.uid() = user_id);
+create policy "Users can update own onboarding responses." on aa_demo_onboarding_responses for update using (auth.uid() = user_id);
 
 /**
  * BRAND_ASSETS
  * Stores existing brand assets uploaded by user or preferences if none exist
  */
-create table brand_assets (
+create table aa_demo_brand_assets (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users not null,
-  business_id uuid references businesses,
+  business_id uuid references aa_demo_businesses,
   -- Existing assets
   has_existing_website boolean default false,
   existing_website_url text,
@@ -65,19 +65,19 @@ create table brand_assets (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
-alter table brand_assets enable row level security;
-create policy "Users can view own brand assets." on brand_assets for select using (auth.uid() = user_id);
-create policy "Users can insert own brand assets." on brand_assets for insert with check (auth.uid() = user_id);
-create policy "Users can update own brand assets." on brand_assets for update using (auth.uid() = user_id);
+alter table aa_demo_brand_assets enable row level security;
+create policy "Users can view own brand assets." on aa_demo_brand_assets for select using (auth.uid() = user_id);
+create policy "Users can insert own brand assets." on aa_demo_brand_assets for insert with check (auth.uid() = user_id);
+create policy "Users can update own brand assets." on aa_demo_brand_assets for update using (auth.uid() = user_id);
 
 /**
  * DOMAIN_REQUESTS
  * Stores domain purchase requests and status
  */
-create table domain_requests (
+create table aa_demo_domain_requests (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users not null,
-  business_id uuid references businesses,
+  business_id uuid references aa_demo_businesses,
   needs_domain boolean default false,
   requested_domain text,
   domain_price numeric(10,2),
@@ -88,10 +88,10 @@ create table domain_requests (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
-alter table domain_requests enable row level security;
-create policy "Users can view own domain requests." on domain_requests for select using (auth.uid() = user_id);
-create policy "Users can insert own domain requests." on domain_requests for insert with check (auth.uid() = user_id);
-create policy "Users can update own domain requests." on domain_requests for update using (auth.uid() = user_id);
+alter table aa_demo_domain_requests enable row level security;
+create policy "Users can view own domain requests." on aa_demo_domain_requests for select using (auth.uid() = user_id);
+create policy "Users can insert own domain requests." on aa_demo_domain_requests for insert with check (auth.uid() = user_id);
+create policy "Users can update own domain requests." on aa_demo_domain_requests for update using (auth.uid() = user_id);
 
 /**
  * GENERATED_ASSETS
@@ -100,10 +100,10 @@ create policy "Users can update own domain requests." on domain_requests for upd
 create type asset_type as enum ('logo', 'branding_guide', 'website_mockup', 'color_palette', 'font_selection');
 create type asset_status as enum ('pending', 'generating', 'ready', 'approved', 'rejected');
 
-create table generated_assets (
+create table aa_demo_generated_assets (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users not null,
-  business_id uuid references businesses,
+  business_id uuid references aa_demo_businesses,
   asset_type asset_type not null,
   -- URL to the asset in Supabase Storage
   storage_url text,
@@ -114,9 +114,9 @@ create table generated_assets (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
-alter table generated_assets enable row level security;
-create policy "Users can view own generated assets." on generated_assets for select using (auth.uid() = user_id);
-create policy "Users can update own generated assets." on generated_assets for update using (auth.uid() = user_id);
+alter table aa_demo_generated_assets enable row level security;
+create policy "Users can view own generated assets." on aa_demo_generated_assets for select using (auth.uid() = user_id);
+create policy "Users can update own generated assets." on aa_demo_generated_assets for update using (auth.uid() = user_id);
 
 /**
  * EDIT_REQUESTS
@@ -124,10 +124,10 @@ create policy "Users can update own generated assets." on generated_assets for u
  */
 create type edit_request_status as enum ('pending', 'in_progress', 'completed', 'rejected');
 
-create table edit_requests (
+create table aa_demo_edit_requests (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users not null,
-  business_id uuid references businesses,
+  business_id uuid references aa_demo_businesses,
   request_description text not null,
   -- For tracking which page/section to edit
   target_page text,
@@ -138,9 +138,9 @@ create table edit_requests (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
-alter table edit_requests enable row level security;
-create policy "Users can view own edit requests." on edit_requests for select using (auth.uid() = user_id);
-create policy "Users can insert own edit requests." on edit_requests for insert with check (auth.uid() = user_id);
+alter table aa_demo_edit_requests enable row level security;
+create policy "Users can view own edit requests." on aa_demo_edit_requests for select using (auth.uid() = user_id);
+create policy "Users can insert own edit requests." on aa_demo_edit_requests for insert with check (auth.uid() = user_id);
 
 /**
  * DEPLOYED_WEBSITES
@@ -148,10 +148,10 @@ create policy "Users can insert own edit requests." on edit_requests for insert 
  */
 create type website_status as enum ('building', 'deployed', 'failed', 'suspended');
 
-create table deployed_websites (
+create table aa_demo_deployed_websites (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users not null,
-  business_id uuid references businesses,
+  business_id uuid references aa_demo_businesses,
   -- Vercel deployment info
   vercel_project_id text,
   vercel_deployment_id text,
@@ -164,17 +164,17 @@ create table deployed_websites (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
-alter table deployed_websites enable row level security;
-create policy "Users can view own deployed websites." on deployed_websites for select using (auth.uid() = user_id);
+alter table aa_demo_deployed_websites enable row level security;
+create policy "Users can view own deployed websites." on aa_demo_deployed_websites for select using (auth.uid() = user_id);
 
 /**
  * HOSTING_PAYMENTS
  * Tracks one-time hosting payments (6 or 12 months)
  */
-create table hosting_payments (
+create table aa_demo_hosting_payments (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users not null,
-  business_id uuid references businesses,
+  business_id uuid references aa_demo_businesses,
   stripe_payment_intent_id text,
   stripe_checkout_session_id text,
   -- 6 or 12 months
@@ -190,8 +190,8 @@ create table hosting_payments (
   hosting_end_date timestamp with time zone,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
-alter table hosting_payments enable row level security;
-create policy "Users can view own hosting payments." on hosting_payments for select using (auth.uid() = user_id);
+alter table aa_demo_hosting_payments enable row level security;
+create policy "Users can view own hosting payments." on aa_demo_hosting_payments for select using (auth.uid() = user_id);
 
 /**
  * UPSELL_SUBSCRIPTIONS
@@ -199,10 +199,10 @@ create policy "Users can view own hosting payments." on hosting_payments for sel
  */
 create type upsell_service as enum ('seo', 'google_ads', 'google_my_business');
 
-create table upsell_subscriptions (
+create table aa_demo_upsell_subscriptions (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users not null,
-  business_id uuid references businesses,
+  business_id uuid references aa_demo_businesses,
   service upsell_service not null,
   stripe_subscription_id text,
   monthly_price numeric(10,2) not null,
@@ -213,22 +213,22 @@ create table upsell_subscriptions (
   canceled_at timestamp with time zone,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
-alter table upsell_subscriptions enable row level security;
-create policy "Users can view own upsell subscriptions." on upsell_subscriptions for select using (auth.uid() = user_id);
+alter table aa_demo_upsell_subscriptions enable row level security;
+create policy "Users can view own upsell subscriptions." on aa_demo_upsell_subscriptions for select using (auth.uid() = user_id);
 
 /**
  * ADMIN_USERS
  * Tracks which users have admin access
  */
-create table admin_users (
+create table aa_demo_admin_users (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users not null unique,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
-alter table admin_users enable row level security;
+alter table aa_demo_admin_users enable row level security;
 -- Admins can view admin_users table
-create policy "Admins can view admin users." on admin_users for select using (
-  auth.uid() in (select user_id from admin_users)
+create policy "Admins can view admin users." on aa_demo_admin_users for select using (
+  auth.uid() in (select user_id from aa_demo_admin_users)
 );
 
 /**
@@ -237,29 +237,29 @@ create policy "Admins can view admin users." on admin_users for select using (
 create or replace function is_admin(user_uuid uuid)
 returns boolean as $$
 begin
-  return exists (select 1 from admin_users where user_id = user_uuid);
+  return exists (select 1 from aa_demo_admin_users where user_id = user_uuid);
 end;
 $$ language plpgsql security definer;
 
 /**
  * Admin policies for viewing all data
  */
-create policy "Admins can view all businesses." on businesses for select using (is_admin(auth.uid()));
-create policy "Admins can update all businesses." on businesses for update using (is_admin(auth.uid()));
-create policy "Admins can view all onboarding responses." on onboarding_responses for select using (is_admin(auth.uid()));
-create policy "Admins can view all brand assets." on brand_assets for select using (is_admin(auth.uid()));
-create policy "Admins can view all generated assets." on generated_assets for select using (is_admin(auth.uid()));
-create policy "Admins can update all generated assets." on generated_assets for update using (is_admin(auth.uid()));
-create policy "Admins can insert generated assets." on generated_assets for insert with check (is_admin(auth.uid()));
-create policy "Admins can view all edit requests." on edit_requests for select using (is_admin(auth.uid()));
-create policy "Admins can update all edit requests." on edit_requests for update using (is_admin(auth.uid()));
-create policy "Admins can view all deployed websites." on deployed_websites for select using (is_admin(auth.uid()));
-create policy "Admins can update all deployed websites." on deployed_websites for update using (is_admin(auth.uid()));
-create policy "Admins can insert deployed websites." on deployed_websites for insert with check (is_admin(auth.uid()));
-create policy "Admins can view all hosting payments." on hosting_payments for select using (is_admin(auth.uid()));
-create policy "Admins can view all upsell subscriptions." on upsell_subscriptions for select using (is_admin(auth.uid()));
-create policy "Admins can view all domain requests." on domain_requests for select using (is_admin(auth.uid()));
-create policy "Admins can update all domain requests." on domain_requests for update using (is_admin(auth.uid()));
+create policy "Admins can view all businesses." on aa_demo_businesses for select using (is_admin(auth.uid()));
+create policy "Admins can update all businesses." on aa_demo_businesses for update using (is_admin(auth.uid()));
+create policy "Admins can view all onboarding responses." on aa_demo_onboarding_responses for select using (is_admin(auth.uid()));
+create policy "Admins can view all brand assets." on aa_demo_brand_assets for select using (is_admin(auth.uid()));
+create policy "Admins can view all generated assets." on aa_demo_generated_assets for select using (is_admin(auth.uid()));
+create policy "Admins can update all generated assets." on aa_demo_generated_assets for update using (is_admin(auth.uid()));
+create policy "Admins can insert generated assets." on aa_demo_generated_assets for insert with check (is_admin(auth.uid()));
+create policy "Admins can view all edit requests." on aa_demo_edit_requests for select using (is_admin(auth.uid()));
+create policy "Admins can update all edit requests." on aa_demo_edit_requests for update using (is_admin(auth.uid()));
+create policy "Admins can view all deployed websites." on aa_demo_deployed_websites for select using (is_admin(auth.uid()));
+create policy "Admins can update all deployed websites." on aa_demo_deployed_websites for update using (is_admin(auth.uid()));
+create policy "Admins can insert deployed websites." on aa_demo_deployed_websites for insert with check (is_admin(auth.uid()));
+create policy "Admins can view all hosting payments." on aa_demo_hosting_payments for select using (is_admin(auth.uid()));
+create policy "Admins can view all upsell subscriptions." on aa_demo_upsell_subscriptions for select using (is_admin(auth.uid()));
+create policy "Admins can view all domain requests." on aa_demo_domain_requests for select using (is_admin(auth.uid()));
+create policy "Admins can update all domain requests." on aa_demo_domain_requests for update using (is_admin(auth.uid()));
 
 /**
  * Trigger to update updated_at timestamp
@@ -272,19 +272,19 @@ begin
 end;
 $$ language plpgsql;
 
-create trigger update_businesses_updated_at before update on businesses
+create trigger update_businesses_updated_at before update on aa_demo_businesses
   for each row execute function update_updated_at_column();
-create trigger update_onboarding_responses_updated_at before update on onboarding_responses
+create trigger update_onboarding_responses_updated_at before update on aa_demo_onboarding_responses
   for each row execute function update_updated_at_column();
-create trigger update_brand_assets_updated_at before update on brand_assets
+create trigger update_brand_assets_updated_at before update on aa_demo_brand_assets
   for each row execute function update_updated_at_column();
-create trigger update_domain_requests_updated_at before update on domain_requests
+create trigger update_domain_requests_updated_at before update on aa_demo_domain_requests
   for each row execute function update_updated_at_column();
-create trigger update_generated_assets_updated_at before update on generated_assets
+create trigger update_generated_assets_updated_at before update on aa_demo_generated_assets
   for each row execute function update_updated_at_column();
-create trigger update_edit_requests_updated_at before update on edit_requests
+create trigger update_edit_requests_updated_at before update on aa_demo_edit_requests
   for each row execute function update_updated_at_column();
-create trigger update_deployed_websites_updated_at before update on deployed_websites
+create trigger update_deployed_websites_updated_at before update on aa_demo_deployed_websites
   for each row execute function update_updated_at_column();
 
 /**
@@ -296,7 +296,7 @@ declare
   edit_count integer;
 begin
   select count(*) into edit_count
-  from edit_requests
+  from aa_demo_edit_requests
   where user_id = user_uuid
     and created_at >= date_trunc('month', current_timestamp)
     and created_at < date_trunc('month', current_timestamp) + interval '1 month';
@@ -311,7 +311,7 @@ create or replace function has_paid_hosting(user_uuid uuid)
 returns boolean as $$
 begin
   return exists (
-    select 1 from hosting_payments 
+    select 1 from aa_demo_hosting_payments 
     where user_id = user_uuid 
       and status = 'paid'
       and hosting_end_date > current_timestamp

@@ -65,7 +65,7 @@ export async function GET(
   const supabase = await createSupabaseServerClient();
 
   const { data: business, error: businessError } = await supabase
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('*')
     .eq('id', businessId)
     .single();
@@ -78,7 +78,7 @@ export async function GET(
   const userId = biz.user_id as string;
 
   const [{ data: brandAssets }, { data: brandGuide }, { data: customerInputs }, { data: inputFolders }] = await Promise.all([
-    supabase.from('brand_assets').select('*').eq('user_id', userId).maybeSingle(),
+    supabase.from('aa_demo_brand_assets').select('*').eq('user_id', userId).maybeSingle(),
     supabase.from('brand_guides').select('*').eq('customer_id', userId).eq('is_active', true).order('updated_at', { ascending: false }).limit(1).maybeSingle(),
     supabase.from('customer_inputs' as any).select('*').eq('user_id', userId).eq('input_type', 'file').order('created_at', { ascending: false }),
     supabase.from('customer_input_folders' as any).select('*').eq('user_id', userId).order('name', { ascending: true }),
@@ -213,7 +213,7 @@ export async function PATCH(
     const updates = await request.json();
 
     const { data: business } = await supabase
-      .from('businesses')
+      .from('aa_demo_businesses')
       .select('user_id')
       .eq('id', businessId)
       .single();
@@ -250,20 +250,20 @@ export async function PATCH(
 
     if (Object.keys(businessUpdates).length > 0) {
       businessUpdates.updated_at = new Date().toISOString();
-      const { error } = await supabase.from('businesses').update(businessUpdates as never).eq('id', businessId);
+      const { error } = await supabase.from('aa_demo_businesses').update(businessUpdates as never).eq('id', businessId);
       if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     if (Object.keys(brandAssetUpdates).length > 0) {
       brandAssetUpdates.updated_at = new Date().toISOString();
-      const { data: existing } = await supabaseAdminClient.from('brand_assets').select('id').eq('user_id', userId).maybeSingle();
+      const { data: existing } = await supabaseAdminClient.from('aa_demo_brand_assets').select('id').eq('user_id', userId).maybeSingle();
       if (existing) {
-        const { error } = await supabaseAdminClient.from('brand_assets').update(brandAssetUpdates as never).eq('user_id', userId);
+        const { error } = await supabaseAdminClient.from('aa_demo_brand_assets').update(brandAssetUpdates as never).eq('user_id', userId);
         if (error) {
           return NextResponse.json({ error: error.message }, { status: 500 });
         }
       } else {
-        const { error } = await supabaseAdminClient.from('brand_assets').insert({ user_id: userId, ...brandAssetUpdates } as never);
+        const { error } = await supabaseAdminClient.from('aa_demo_brand_assets').insert({ user_id: userId, ...brandAssetUpdates } as never);
         if (error) {
           return NextResponse.json({ error: error.message }, { status: 500 });
         }

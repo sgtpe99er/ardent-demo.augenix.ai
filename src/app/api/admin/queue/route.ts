@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
   const offset = (page - 1) * perPage;
 
   let query = supabaseAdminClient
-    .from('async_requests')
+    .from('aa_demo_async_requests')
     .select('id, business_id, user_id, task_type, priority, payload, status, claimed_by, claimed_at, result, error, retry_count, max_retries, created_at, updated_at, completed_at', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(offset, offset + perPage - 1);
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
   let businessNames: Record<string, string> = {};
   if (businessIds.length > 0) {
     const { data: businesses } = await supabaseAdminClient
-      .from('businesses')
+      .from('aa_demo_businesses')
       .select('id, business_name')
       .in('id', businessIds);
     for (const b of businesses ?? []) {

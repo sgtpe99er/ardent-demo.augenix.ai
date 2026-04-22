@@ -34,7 +34,7 @@ export async function PATCH(
 
   // Fetch current asset to merge metadata
   const { data: asset, error: fetchError } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .select('id, metadata')
     .eq('id', assetId)
     .eq('business_id', businessId)
@@ -48,7 +48,7 @@ export async function PATCH(
 
   // Update asset metadata with Canva fields
   const { error: updateError } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .update({
       metadata: {
         ...(typedAsset.metadata ?? {}),
@@ -68,7 +68,7 @@ export async function PATCH(
 
   // Mark the corresponding edit_request as completed
   const { error: taskError } = await supabaseAdminClient
-    .from('edit_requests')
+    .from('aa_demo_edit_requests')
     .update({
       status: 'completed',
       completed_at: new Date().toISOString(),

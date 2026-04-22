@@ -26,7 +26,7 @@ export async function GET(
 
   // Fetch business data
   const { data: business, error: bizError } = await supabase
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('*')
     .eq('id', businessId)
     .single();
@@ -41,7 +41,7 @@ export async function GET(
   // Fetch brand_assets for social links - use user_id since that's how Onboarding saves it
   const userId = biz.user_id as string;
   const { data: brandAssets } = await supabase
-    .from('brand_assets')
+    .from('aa_demo_brand_assets')
     .select('*')
     .eq('user_id', userId)
     .single();
@@ -131,7 +131,7 @@ export async function PATCH(
 
     // First get the business to find the user_id for brand_assets
     const { data: business } = await supabase
-      .from('businesses')
+      .from('aa_demo_businesses')
       .select('user_id')
       .eq('id', businessId)
       .single();
@@ -207,7 +207,7 @@ export async function PATCH(
       businessUpdates.updated_at = new Date().toISOString();
       console.log('Website Guide PATCH - businessUpdates:', JSON.stringify(businessUpdates, null, 2));
       const { error: bizError } = await supabase
-        .from('businesses')
+        .from('aa_demo_businesses')
         .update(businessUpdates as never)
         .eq('id', businessId);
 
@@ -223,14 +223,14 @@ export async function PATCH(
 
       // Check if brand_assets exists for this user
       const { data: existing } = await supabase
-        .from('brand_assets')
+        .from('aa_demo_brand_assets')
         .select('id')
         .eq('user_id', userId)
         .maybeSingle();
 
       if (existing) {
         const { error: assetError } = await supabase
-          .from('brand_assets')
+          .from('aa_demo_brand_assets')
           .update(brandAssetUpdates as never)
           .eq('user_id', userId);
 
@@ -240,7 +240,7 @@ export async function PATCH(
         }
       } else {
         const { error: assetError } = await supabase
-          .from('brand_assets')
+          .from('aa_demo_brand_assets')
           .insert({ user_id: userId, ...brandAssetUpdates } as never);
 
         if (assetError) {

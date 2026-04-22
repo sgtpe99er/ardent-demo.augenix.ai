@@ -21,14 +21,14 @@ export async function GET() {
 
   // Fetch business data
   const { data: business } = await supabase
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('*')
     .eq('user_id', user.id)
     .single();
 
   // Fetch brand assets
   const { data: brandAssets } = await supabase
-    .from('brand_assets')
+    .from('aa_demo_brand_assets')
     .select('*')
     .eq('user_id', user.id)
     .single();
@@ -41,7 +41,7 @@ export async function GET() {
     .single();
 
   const { data: customerInputs } = await supabase
-    .from('customer_inputs')
+    .from('aa_demo_customer_inputs')
     .select('*')
     .eq('user_id', user.id)
     .eq('onboarding_step', 5)

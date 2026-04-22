@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
   const limit = Math.min(parseInt(searchParams.get('limit') ?? '5', 10), 50);
 
   let query = supabaseAdminClient
-    .from('async_requests')
+    .from('aa_demo_async_requests')
     .select('id, business_id, user_id, task_type, priority, payload, status, claimed_by, claimed_at, retry_count, max_retries, created_at, updated_at')
     .order('priority', { ascending: true })
     .order('created_at', { ascending: true })

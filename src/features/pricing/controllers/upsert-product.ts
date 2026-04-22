@@ -15,7 +15,7 @@ export async function upsertProduct(product: Stripe.Product) {
     metadata: product.metadata,
   };
 
-  const { error } = await supabaseAdminClient.from('products').upsert([productData]);
+  const { error } = await supabaseAdminClient.from('aa_demo_products').upsert([productData]);
 
   if (error) {
     throw error;

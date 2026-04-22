@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
   // Record timestamp
   await supabaseAdminClient
-    .from('businesses')
+    .from('aa_demo_businesses')
     .update({ payment_link_sent_at: new Date().toISOString() } as any)
     .eq('user_id', userId);
 

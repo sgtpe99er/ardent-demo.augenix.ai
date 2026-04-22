@@ -1,8 +1,8 @@
 import type { Tables } from '@/libs/supabase/types';
 
-export type Business = Tables<'businesses'>;
-export type EditRequest = Tables<'edit_requests'>;
-export type GeneratedAsset = Tables<'generated_assets'>;
+export type Business = Tables<'aa_demo_businesses'>;
+export type EditRequest = Tables<'aa_demo_edit_requests'>;
+export type GeneratedAsset = Tables<'aa_demo_generated_assets'>;
 
 export type CustomerWithEmail = {
   user_id: string;

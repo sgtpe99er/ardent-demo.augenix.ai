@@ -13,7 +13,7 @@ export async function GET(
 
   // Verify user owns the business
   const { data: business } = await supabaseAdminClient
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('id')
     .eq('id', businessId)
     .eq('user_id', session.user.id)

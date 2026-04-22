@@ -27,7 +27,7 @@ export async function purchaseDomain({
 
   // Mark as purchasing
   await db
-    .from('businesses')
+    .from('aa_demo_businesses')
     .update({ domain_status: 'purchasing', updated_at: new Date().toISOString() } as any)
     .eq('id', businessId);
 
@@ -45,7 +45,7 @@ export async function purchaseDomain({
 
     // Load registrant contact from the customer's business record
     const { data: bizRow } = await db
-      .from('businesses')
+      .from('aa_demo_businesses')
       .select('domain_registrant_contact')
       .eq('id', businessId)
       .single();
@@ -69,7 +69,7 @@ export async function purchaseDomain({
 
     // Update DB: domain active
     await db
-      .from('businesses')
+      .from('aa_demo_businesses')
       .update({
         domain_name: domain,
         domain_status: 'active',
@@ -83,7 +83,7 @@ export async function purchaseDomain({
     console.error('purchaseDomain failed:', err);
 
     await db
-      .from('businesses')
+      .from('aa_demo_businesses')
       .update({ domain_status: 'failed', updated_at: new Date().toISOString() } as any)
       .eq('id', businessId);
 

@@ -50,7 +50,7 @@ export async function POST(
 
   // 1. Fetch the original asset
   const { data: asset, error: assetError } = await db
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .select('*')
     .eq('id', assetId)
     .eq('business_id', businessId)
@@ -67,7 +67,7 @@ export async function POST(
 
   // 2. Fetch business info for the prompt
   const { data: business } = await db
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('business_name, industry, services_products')
     .eq('id', businessId)
     .single();
@@ -187,7 +187,7 @@ export async function POST(
 
   // 10. Create new generated_assets record (keep original)
   const { data: newAsset, error: insertError } = await db
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .insert({
       user_id: typedAsset.user_id,
       business_id: businessId,

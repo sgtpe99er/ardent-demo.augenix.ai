@@ -3,8 +3,8 @@ import { createSupabaseServerClient } from '@/libs/supabase/supabase-server-clie
 import { getSession } from '@/features/account/controllers/get-session';
 import type { Tables } from '@/libs/supabase/types';
 
-type EditRequest = Tables<'edit_requests'>;
-type Business = Tables<'businesses'>;
+type EditRequest = Tables<'aa_demo_edit_requests'>;
+type Business = Tables<'aa_demo_businesses'>;
 
 export async function GET(request: NextRequest) {
   try {
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 
     // Build query
     let query = supabase
-      .from('edit_requests')
+      .from('aa_demo_edit_requests')
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 
     // Get total count
     const { count } = await supabase
-      .from('edit_requests')
+      .from('aa_demo_edit_requests')
       .select('*', { count: 'exact', head: true })
       .in('status', (status ? status.split(',') : ['pending', 'in_progress', 'completed', 'failed']) as any);
 
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch businesses for names
     const { data: businesses } = await supabase
-      .from('businesses')
+      .from('aa_demo_businesses')
       .select('user_id, business_name');
 
     const bizByUserId = Object.fromEntries(

@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   startOfMonth.setHours(0, 0, 0, 0);
 
   const { count } = await supabase
-    .from('edit_requests')
+    .from('aa_demo_edit_requests')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', userId)
     .neq('status', 'rejected')
@@ -36,13 +36,13 @@ export async function POST(req: NextRequest) {
 
   // Fetch business_id
   const { data: business } = await supabase
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('id')
     .eq('user_id', userId)
     .maybeSingle() as unknown as { data: { id: string } | null };
 
   const { data: inserted, error } = await supabase
-    .from('edit_requests')
+    .from('aa_demo_edit_requests')
     .insert({
       user_id: userId,
       business_id: business?.id ?? null,
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
 
   // Also enqueue in async_requests for agent processing
   const { error: queueError } = await supabaseAdminClient
-    .from('async_requests')
+    .from('aa_demo_async_requests')
     .insert({
       business_id: business?.id ?? null,
       user_id: userId,

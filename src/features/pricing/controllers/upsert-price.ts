@@ -20,7 +20,7 @@ export async function upsertPrice(price: Stripe.Price) {
     metadata: price.metadata,
   };
 
-  const { error } = await supabaseAdminClient.from('prices').upsert([priceData]);
+  const { error } = await supabaseAdminClient.from('aa_demo_prices').upsert([priceData]);
 
   if (error) {
     throw error;

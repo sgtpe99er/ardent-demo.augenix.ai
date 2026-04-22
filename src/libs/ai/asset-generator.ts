@@ -58,7 +58,7 @@ export async function generateAssets(input: GenerateAssetsInput): Promise<{
     metadata: Record<string, unknown>
   ) => {
     await db
-      .from('generated_assets')
+      .from('aa_demo_generated_assets')
       .insert({
         user_id: input.userId,
         business_id: input.businessId,
@@ -132,7 +132,7 @@ export async function generateAssets(input: GenerateAssetsInput): Promise<{
 
     // Step 6: Update business status to assets_ready
     await db
-      .from('businesses')
+      .from('aa_demo_businesses')
       .update({ status: 'assets_ready', updated_at: new Date().toISOString() } as any)
       .eq('user_id', input.userId);
 
@@ -154,7 +154,7 @@ export async function generateAssets(input: GenerateAssetsInput): Promise<{
 
     // Mark business as failed so admin can retry
     await db
-      .from('businesses')
+      .from('aa_demo_businesses')
       .update({ status: 'paid', updated_at: new Date().toISOString() } as any)
       .eq('user_id', input.userId);
 

@@ -62,7 +62,7 @@ export async function POST(
       };
 
       const { error: updateError } = await supabase
-        .from('generated_assets')
+        .from('aa_demo_generated_assets')
         .update(updateData as unknown as never)
         .eq('id', assetId);
 
@@ -73,7 +73,7 @@ export async function POST(
     } else {
       // Create new asset record
       const { error: insertError } = await supabase
-        .from('generated_assets')
+        .from('aa_demo_generated_assets')
         .insert({
           user_id: userId,
           asset_type: assetType,

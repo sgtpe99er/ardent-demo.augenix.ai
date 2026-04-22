@@ -31,7 +31,7 @@ export async function POST(
 
   // Fetch the winning asset
   const { data: winnerAsset, error: fetchError } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .select('id, feedback_round, user_id, storage_url, metadata')
     .eq('id', assetId)
     .single();
@@ -51,7 +51,7 @@ export async function POST(
 
   // Reject all other logos for this business in the same round
   const { error: rejectError } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .update({ status: 'rejected', is_selected: false, updated_at: new Date().toISOString() } as any)
     .eq('user_id', asset.user_id)
     .eq('feedback_round', feedbackRound)
@@ -104,7 +104,7 @@ export async function POST(
           const contentType2 = imageResponse2.headers.get('content-type') || 'image/png';
 
           const { data: business } = await supabaseAdminClient
-            .from('businesses')
+            .from('aa_demo_businesses')
             .select('business_name')
             .eq('id', businessId)
             .maybeSingle();
@@ -134,7 +134,7 @@ export async function POST(
 
   // Mark as selected winner
   const { data: winner, error: selectError } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .update({
       is_selected: true,
       status: 'ready',

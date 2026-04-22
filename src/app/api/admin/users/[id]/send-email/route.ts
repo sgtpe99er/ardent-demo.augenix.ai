@@ -43,7 +43,7 @@ export async function POST(
   const email = authUser.user.email;
 
   const { data: business } = await supabaseAdminClient
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('business_name, deployed_websites(subdomain, custom_domain)')
     .eq('user_id', userId)
     .maybeSingle();

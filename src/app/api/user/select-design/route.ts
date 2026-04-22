@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
   // Verify the asset belongs to this user
   const { data: asset, error: fetchError } = await db
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .select('id, asset_type, user_id')
     .eq('id', asset_id)
     .eq('user_id', session.user.id)
@@ -31,14 +31,14 @@ export async function POST(req: NextRequest) {
 
   // Clear any previously selected mockup for this user
   await db
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .update({ is_selected: false, updated_at: new Date().toISOString() })
     .eq('user_id', session.user.id)
     .eq('asset_type', 'website_mockup');
 
   // Mark the chosen mockup as selected
   const { error: updateError } = await db
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .update({ is_selected: true, status: 'approved', updated_at: new Date().toISOString() })
     .eq('id', asset_id);
 
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
 
   // Update business status to 'approved' so admin knows to start building
   await db
-    .from('businesses')
+    .from('aa_demo_businesses')
     .update({ status: 'approved', updated_at: new Date().toISOString() })
     .eq('user_id', session.user.id);
 

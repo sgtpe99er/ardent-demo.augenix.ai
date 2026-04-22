@@ -75,10 +75,10 @@ export async function POST(_req: NextRequest) {
   const userId = session.user.id;
 
   const [{ data: business }, { data: brandAssets }, { data: existingBrandGuide }, { data: customerInputs }] = await Promise.all([
-    any.from('businesses').select('*').eq('user_id', userId).single(),
-    any.from('brand_assets').select('*').eq('user_id', userId).single(),
+    any.from('aa_demo_businesses').select('*').eq('user_id', userId).single(),
+    any.from('aa_demo_brand_assets').select('*').eq('user_id', userId).single(),
     any.from('brand_guides').select('*').eq('user_id', userId).eq('source', 'onboarding').single(),
-    any.from('customer_inputs').select('*').eq('user_id', userId).eq('onboarding_step', 5).eq('is_archived', false).order('created_at', { ascending: true }),
+    any.from('aa_demo_customer_inputs').select('*').eq('user_id', userId).eq('onboarding_step', 5).eq('is_archived', false).order('created_at', { ascending: true }),
   ]);
 
   const templateKey = brandAssets?.brand_guide_prompt_template_key || existingBrandGuide?.prompt_template_key || 'brand-guide-default';
@@ -185,7 +185,7 @@ ${JSON.stringify(promptContext, null, 2)}`;
     updated_at: now,
   };
 
-  const { error: brandAssetsError } = await any.from('brand_assets').upsert(brandAssetsPayload, { onConflict: 'user_id' });
+  const { error: brandAssetsError } = await any.from('aa_demo_brand_assets').upsert(brandAssetsPayload, { onConflict: 'user_id' });
   if (brandAssetsError) {
     console.error('[onboarding/generate-brand-guide] brand_assets mirror error:', brandAssetsError);
     return NextResponse.json({ error: brandAssetsError.message }, { status: 500 });

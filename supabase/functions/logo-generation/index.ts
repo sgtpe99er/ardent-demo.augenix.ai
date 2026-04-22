@@ -171,7 +171,7 @@ Deno.serve(async (req: Request) => {
 
   // 1. Fetch business context
   const { data: business, error: bizError } = await supabase
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('id, user_id, business_name, industry, location_city, location_state, target_audience, services_products')
     .eq('id', businessId)
     .single()

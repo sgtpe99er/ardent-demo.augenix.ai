@@ -10,7 +10,7 @@ function verifyAgentApiKey(request: NextRequest): boolean {
 
 async function resolveUserId(businessId: string): Promise<string | null> {
   const { data: business, error } = await supabaseAdminClient
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('user_id')
     .eq('id', businessId)
     .single();
@@ -35,7 +35,7 @@ export async function GET(
   }
 
   const { data: assets, error } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .select('*')
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
@@ -100,7 +100,7 @@ export async function POST(
   }
 
   const { data: asset, error: insertError } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .insert({
       user_id: userId,
       asset_type: assetType,
@@ -119,7 +119,7 @@ export async function POST(
   // Clean up any 'generating' placeholder assets for this business+type
   if (assetType === 'logo') {
     await supabaseAdminClient
-      .from('generated_assets')
+      .from('aa_demo_generated_assets')
       .delete()
       .eq('user_id', userId)
       .eq('asset_type', 'logo')

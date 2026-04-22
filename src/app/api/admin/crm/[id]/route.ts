@@ -90,7 +90,7 @@ export async function PATCH(
 
         if (!createError && newUser.user) {
           const userId = newUser.user.id;
-          await supabaseAdminClient.from('businesses').insert({
+          await supabaseAdminClient.from('aa_demo_businesses').insert({
             user_id: userId,
             business_name: businessName || null,
             status: 'onboarding',

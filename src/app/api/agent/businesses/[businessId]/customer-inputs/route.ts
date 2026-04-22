@@ -19,7 +19,7 @@ export async function GET(
   const { businessId } = await params;
 
   const { data: business, error: businessError } = await supabaseAdminClient
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('user_id')
     .eq('id', businessId)
     .single();

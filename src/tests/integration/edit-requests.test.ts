@@ -27,7 +27,7 @@ const mockEditRequestsInsert = vi.fn();
 vi.mock('@/libs/supabase/supabase-server-client', () => ({
   createSupabaseServerClient: vi.fn().mockResolvedValue({
     from: vi.fn().mockImplementation((table: string) => {
-      if (table === 'edit_requests') {
+      if (table === aa_demo_edit_requests) {
         return {
           // First call: count query; Second call: insert
           select: vi.fn().mockReturnValue({
@@ -38,7 +38,7 @@ vi.mock('@/libs/supabase/supabase-server-client', () => ({
           insert: mockEditRequestsInsert,
         };
       }
-      if (table === 'businesses') {
+      if (table === aa_demo_businesses) {
         return {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnThis(),

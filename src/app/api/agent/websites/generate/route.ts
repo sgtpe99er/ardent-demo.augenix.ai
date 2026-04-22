@@ -166,14 +166,14 @@ export async function POST(request: NextRequest) {
 
   // Get or create business record
   let { data: business } = await db
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('id, business_name')
     .eq('user_id', userId)
     .single();
 
   if (!business) {
     const { data: newBiz } = await db
-      .from('businesses')
+      .from('aa_demo_businesses')
       .insert({
         user_id: userId,
         business_name: businessData?.name || null,
@@ -208,7 +208,7 @@ export async function POST(request: NextRequest) {
     }
     updateFields.updated_at = new Date().toISOString();
 
-    await db.from('businesses').update(updateFields as any).eq('id', (business as any).id);
+    await db.from('aa_demo_businesses').update(updateFields as any).eq('id', (business as any).id);
   }
 
   const businessName = businessData?.name || (business as any).business_name || 'site';
@@ -362,7 +362,7 @@ export async function POST(request: NextRequest) {
 
     // 6. Update business status
     await db
-      .from('businesses')
+      .from('aa_demo_businesses')
       .update({ status: 'website_building', updated_at: new Date().toISOString() } as any)
       .eq('id', (business as any).id);
 

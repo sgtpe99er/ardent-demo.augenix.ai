@@ -4,7 +4,7 @@
 -- Tracks the 3 home page design variants per business
 create table if not exists design_variants (
   id                   uuid primary key default gen_random_uuid(),
-  business_id          uuid not null references businesses(id) on delete cascade,
+  business_id          uuid not null references aa_demo_businesses(id) on delete cascade,
   deployed_website_id  uuid references deployed_websites(id) on delete set null,
   variant_number       int not null check (variant_number between 1 and 3),
   label                text not null,
@@ -20,7 +20,7 @@ create table if not exists design_variants (
 -- Records which design variant a user selected
 create table if not exists design_selections (
   id          uuid primary key default gen_random_uuid(),
-  business_id uuid not null references businesses(id) on delete cascade,
+  business_id uuid not null references aa_demo_businesses(id) on delete cascade,
   user_id     uuid not null references auth.users(id) on delete cascade,
   variant_id  uuid not null references design_variants(id) on delete cascade,
   selected_at timestamptz not null default now(),
@@ -30,7 +30,7 @@ create table if not exists design_selections (
 -- Stores free-form preview feedback from users
 create table if not exists preview_feedback (
   id            uuid primary key default gen_random_uuid(),
-  business_id   uuid not null references businesses(id) on delete cascade,
+  business_id   uuid not null references aa_demo_businesses(id) on delete cascade,
   user_id       uuid not null references auth.users(id) on delete cascade,
   variant_id    uuid references design_variants(id) on delete set null,
   feedback_text text not null,

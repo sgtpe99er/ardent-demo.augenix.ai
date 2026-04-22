@@ -5,7 +5,7 @@ export async function getProducts(): Promise<ProductWithPrices[]> {
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
-    .from('products')
+    .from('aa_demo_products')
     .select('*, prices(*)')
     .eq('active', true)
     .eq('prices.active', true)

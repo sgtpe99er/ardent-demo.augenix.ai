@@ -5,7 +5,7 @@ export async function getSubscription(): Promise<SubscriptionWithProduct | null>
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase
-    .from('subscriptions')
+    .from('aa_demo_subscriptions')
     .select('*, prices(*, products(*))')
     .in('status', ['trialing', 'active'])
     .maybeSingle();

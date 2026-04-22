@@ -20,7 +20,7 @@ export async function POST(
 
     // Check if user is admin
     const { data: adminUser } = await supabaseAdminClient
-      .from('admin_users')
+      .from('aa_demo_admin_users')
       .select('id')
       .eq('user_id', user.id)
       .single();
@@ -142,7 +142,7 @@ export async function POST(
     // Check if business already exists for the customer (session's user_id)
     const targetUserId = session.user_id as string;
     const { data: existingBusiness } = await supabaseAdminClient
-      .from('businesses')
+      .from('aa_demo_businesses')
       .select('id')
       .eq('user_id', targetUserId)
       .single();
@@ -154,7 +154,7 @@ export async function POST(
       // Update existing business
       if (Object.keys(businessData).length > 1) { // more than just user_id
         await supabaseAdminClient
-          .from('businesses')
+          .from('aa_demo_businesses')
           .update(businessData)
           .eq('id', businessId);
       }
@@ -162,7 +162,7 @@ export async function POST(
       // Create new business
       businessData.status = 'onboarding';
       const { data: newBusiness } = await supabaseAdminClient
-        .from('businesses')
+        .from('aa_demo_businesses')
         .insert(businessData as any)
         .select('id')
         .single();
@@ -172,18 +172,18 @@ export async function POST(
     // Upsert brand_assets if we have brand/social data
     if (Object.keys(brandAssetsData).length > 0 && businessId) {
       const { data: existingAssets } = await supabaseAdminClient
-        .from('brand_assets')
+        .from('aa_demo_brand_assets')
         .select('id')
         .eq('user_id', targetUserId)
         .single();
 
       if (existingAssets) {
         await supabaseAdminClient
-          .from('brand_assets')
+          .from('aa_demo_brand_assets')
           .update(brandAssetsData as any)
           .eq('id', existingAssets.id);
       } else {
-        await supabaseAdminClient.from('brand_assets').insert({
+        await supabaseAdminClient.from('aa_demo_brand_assets').insert({
           user_id: targetUserId,
           business_id: businessId,
           ...brandAssetsData,

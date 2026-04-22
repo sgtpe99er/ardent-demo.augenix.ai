@@ -4,21 +4,21 @@
 DO $$
 DECLARE
   tables_cols text[][] := ARRAY[
-    ARRAY['users',                 'id',      'users_id_fkey'],
-    ARRAY['customers',             'id',      'customers_id_fkey'],
-    ARRAY['subscriptions',         'user_id', 'subscriptions_user_id_fkey'],
-    ARRAY['businesses',            'user_id', 'businesses_user_id_fkey'],
-    ARRAY['onboarding_responses',  'user_id', 'onboarding_responses_user_id_fkey'],
-    ARRAY['brand_assets',          'user_id', 'brand_assets_user_id_fkey'],
-    ARRAY['domain_requests',       'user_id', 'domain_requests_user_id_fkey'],
-    ARRAY['generated_assets',      'user_id', 'generated_assets_user_id_fkey'],
-    ARRAY['edit_requests',         'user_id', 'edit_requests_user_id_fkey'],
-    ARRAY['deployed_websites',     'user_id', 'deployed_websites_user_id_fkey'],
-    ARRAY['hosting_payments',      'user_id', 'hosting_payments_user_id_fkey'],
-    ARRAY['upsell_subscriptions',  'user_id', 'upsell_subscriptions_user_id_fkey'],
-    ARRAY['admin_users',           'user_id', 'admin_users_user_id_fkey'],
-    ARRAY['customer_inputs',       'user_id', 'customer_inputs_user_id_fkey'],
-    ARRAY['customer_input_folders','user_id', 'customer_input_folders_user_id_fkey']
+    ARRAY['aa_demo_users',                 'id',      'aa_demo_users_id_fkey'],
+    ARRAY['aa_demo_customers',             'id',      'aa_demo_customers_id_fkey'],
+    ARRAY['aa_demo_subscriptions',         'user_id', 'aa_demo_subscriptions_user_id_fkey'],
+    ARRAY['aa_demo_businesses',            'user_id', 'aa_demo_businesses_user_id_fkey'],
+    ARRAY['aa_demo_onboarding_responses',  'user_id', 'aa_demo_onboarding_responses_user_id_fkey'],
+    ARRAY['aa_demo_brand_assets',          'user_id', 'aa_demo_brand_assets_user_id_fkey'],
+    ARRAY['aa_demo_domain_requests',       'user_id', 'aa_demo_domain_requests_user_id_fkey'],
+    ARRAY['aa_demo_generated_assets',      'user_id', 'aa_demo_generated_assets_user_id_fkey'],
+    ARRAY['aa_demo_edit_requests',         'user_id', 'aa_demo_edit_requests_user_id_fkey'],
+    ARRAY['aa_demo_deployed_websites',     'user_id', 'aa_demo_deployed_websites_user_id_fkey'],
+    ARRAY['aa_demo_hosting_payments',      'user_id', 'aa_demo_hosting_payments_user_id_fkey'],
+    ARRAY['aa_demo_upsell_subscriptions',  'user_id', 'aa_demo_upsell_subscriptions_user_id_fkey'],
+    ARRAY['aa_demo_admin_users',           'user_id', 'aa_demo_admin_users_user_id_fkey'],
+    ARRAY['aa_demo_customer_inputs',       'user_id', 'aa_demo_customer_inputs_user_id_fkey'],
+    ARRAY['aa_demo_customer_input_folders','user_id', 'aa_demo_customer_input_folders_user_id_fkey']
   ];
   t text[];
   tbl text;

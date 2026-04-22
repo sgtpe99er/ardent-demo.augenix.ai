@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
 
   // Fetch the existing website record
   const { data: website, error: fetchError } = await supabaseAdmin
-    .from('deployed_websites')
+    .from('aa_demo_deployed_websites')
     .select('*')
     .eq('id', website_id)
     .single();
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
       const repo = await createRepoFromTemplate(repoName);
       repoUrl = repo.html_url;
       await supabaseAdmin
-        .from('deployed_websites')
+        .from('aa_demo_deployed_websites')
         .update({ github_repo_name: repo.name, github_repo_url: repo.html_url })
         .eq('id', website.id);
     }
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
       const vercelProject = await createProject(repoName, repoName);
       vercelProjectId = vercelProject.id;
       await supabaseAdmin
-        .from('deployed_websites')
+        .from('aa_demo_deployed_websites')
         .update({ vercel_project_id: vercelProject.id })
         .eq('id', website.id);
     }
@@ -152,7 +152,7 @@ export async function POST(req: NextRequest) {
 
     // 6. Mark as building
     await supabaseAdmin
-      .from('deployed_websites')
+      .from('aa_demo_deployed_websites')
       .update({
         status: 'building',
         dev_url: `https://${subdomain}`,

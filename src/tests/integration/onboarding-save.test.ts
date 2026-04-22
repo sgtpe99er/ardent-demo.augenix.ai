@@ -31,16 +31,16 @@ vi.mock('@/libs/supabase/supabase-server-client', () => ({
   createSupabaseServerClient: vi.fn().mockResolvedValue({
     auth: { getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }) },
     from: vi.fn().mockImplementation((table: string) => {
-      if (table === 'businesses') {
+      if (table === aa_demo_businesses) {
         return {
           upsert: mockBusinessesUpsert,
           update: vi.fn().mockReturnValue({ eq: mockBusinessesUpdate }),
         };
       }
-      if (table === 'brand_assets') {
+      if (table === aa_demo_brand_assets) {
         return { upsert: mockBrandAssetsUpsert };
       }
-      if (table === 'domain_requests') {
+      if (table === aa_demo_domain_requests) {
         return { upsert: mockDomainRequestsUpsert };
       }
       return { upsert: vi.fn().mockResolvedValue({ error: null }) };

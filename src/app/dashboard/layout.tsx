@@ -42,7 +42,7 @@ export default async function DashboardLayout({ children }: PropsWithChildren) {
 
   const supabase = await createSupabaseServerClient();
   const { data: business } = await supabase
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('business_name')
     .eq('user_id', viewAsUserId)
     .maybeSingle();

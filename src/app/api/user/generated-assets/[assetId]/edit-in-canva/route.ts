@@ -25,7 +25,7 @@ export async function POST(
 
   // Fetch the asset, verify ownership
   const { data: asset, error: fetchError } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .select('id, user_id, storage_url, metadata, asset_type')
     .eq('id', assetId)
     .single();
@@ -69,7 +69,7 @@ export async function POST(
 
   // Get business name for design title
   const { data: business } = await supabaseAdminClient
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('business_name')
     .eq('user_id', session.user.id)
     .maybeSingle();
@@ -91,7 +91,7 @@ export async function POST(
 
     // Store Canva IDs in metadata
     await supabaseAdminClient
-      .from('generated_assets')
+      .from('aa_demo_generated_assets')
       .update({
         metadata: {
           ...(typedAsset.metadata ?? {}),

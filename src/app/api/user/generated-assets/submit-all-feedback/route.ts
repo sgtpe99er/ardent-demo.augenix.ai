@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
   const assetIds = feedbacks.map((f) => f.assetId);
   const { data: assets, error: assetsError } = await supabaseAdminClient
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .select('id, feedback_round, user_id, metadata')
     .in('id', assetIds);
 
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
   // Get the user's business for placeholder creation
   const { data: business } = await supabaseAdminClient
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('id')
     .eq('user_id', session.user.id)
     .maybeSingle();
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
 
   const dislikedAssetIds = feedbacks.filter((f) => f.overallRating === 'dislike').map((f) => f.assetId);
   if (dislikedAssetIds.length > 0) {
-    await supabaseAdminClient.from('generated_assets').update({ status: 'rejected' }).in('id', dislikedAssetIds);
+    await supabaseAdminClient.from('aa_demo_generated_assets').update({ status: 'rejected' }).in('id', dislikedAssetIds);
   }
 
   const currentRound = Math.max(...Array.from(roundByAssetId.values()), 1);
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
         })),
       ];
 
-      await supabaseAdminClient.from('generated_assets').insert(placeholders as any);
+      await supabaseAdminClient.from('aa_demo_generated_assets').insert(placeholders as any);
 
       triggerLogoGeneration(businessId, {
         feedbackRound: currentRound,
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
         metadata: { variant, generation_round: nextRound, generation_type: 'initial' },
       }));
 
-      await supabaseAdminClient.from('generated_assets').insert(placeholders as any);
+      await supabaseAdminClient.from('aa_demo_generated_assets').insert(placeholders as any);
 
       triggerLogoGeneration(businessId, {
         feedbackRound: currentRound,

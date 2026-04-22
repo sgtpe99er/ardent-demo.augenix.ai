@@ -19,20 +19,20 @@ async function upsertBrandAssets(userId: string, update: Record<string, unknown>
   update.updated_at = new Date().toISOString();
 
   const { data: existing } = await supabaseAdminClient
-    .from('brand_assets')
+    .from('aa_demo_brand_assets')
     .select('id')
     .eq('user_id', userId)
     .maybeSingle();
 
   if (existing) {
     const { error } = await supabaseAdminClient
-      .from('brand_assets')
+      .from('aa_demo_brand_assets')
       .update(update as any)
       .eq('user_id', userId);
     return error;
   } else {
     const { error } = await supabaseAdminClient
-      .from('brand_assets')
+      .from('aa_demo_brand_assets')
       .insert({ user_id: userId, ...update } as any);
     return error;
   }
@@ -77,7 +77,7 @@ export async function PATCH(
     if (Object.keys(businessUpdate).length > 0) {
       businessUpdate.updated_at = new Date().toISOString();
       const { error } = await supabaseAdminClient
-        .from('businesses')
+        .from('aa_demo_businesses')
         .update(businessUpdate as any)
         .eq('user_id', userId);
       if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -98,7 +98,7 @@ export async function PATCH(
     if (Object.keys(businessUpdate).length > 0) {
       businessUpdate.updated_at = new Date().toISOString();
       const { error } = await supabaseAdminClient
-        .from('businesses')
+        .from('aa_demo_businesses')
         .update(businessUpdate as any)
         .eq('user_id', userId);
       if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -135,7 +135,7 @@ export async function PATCH(
     if (Object.keys(businessUpdate).length > 0) {
       businessUpdate.updated_at = new Date().toISOString();
       const { error } = await supabaseAdminClient
-        .from('businesses')
+        .from('aa_demo_businesses')
         .update(businessUpdate as any)
         .eq('user_id', userId);
       if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -201,7 +201,7 @@ export async function PATCH(
     if (Object.keys(businessUpdate).length > 0) {
       businessUpdate.updated_at = new Date().toISOString();
       const { error } = await supabaseAdminClient
-        .from('businesses')
+        .from('aa_demo_businesses')
         .update(businessUpdate as any)
         .eq('user_id', userId);
       if (error) return NextResponse.json({ error: error.message }, { status: 500 });

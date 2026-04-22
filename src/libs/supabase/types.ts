@@ -138,14 +138,14 @@ export type Database = {
             foreignKeyName: "async_requests_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
-            referencedRelation: "businesses"
+            referencedRelation: aa_demo_businesses
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "async_requests_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: aa_demo_users
             referencedColumns: ["id"]
           }
         ]
@@ -294,7 +294,7 @@ export type Database = {
             foreignKeyName: "brand_assets_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
-            referencedRelation: "businesses"
+            referencedRelation: aa_demo_businesses
             referencedColumns: ["id"]
           },
         ]
@@ -359,7 +359,7 @@ export type Database = {
             foreignKeyName: "brand_guides_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: aa_demo_users
             referencedColumns: ["id"]
           },
           {
@@ -590,7 +590,7 @@ export type Database = {
             foreignKeyName: "customer_inputs_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
-            referencedRelation: "businesses"
+            referencedRelation: aa_demo_businesses
             referencedColumns: ["id"]
           },
         ]
@@ -685,7 +685,7 @@ export type Database = {
             foreignKeyName: "deployed_websites_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
-            referencedRelation: "businesses"
+            referencedRelation: aa_demo_businesses
             referencedColumns: ["id"]
           },
         ]
@@ -735,7 +735,7 @@ export type Database = {
             foreignKeyName: "domain_requests_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
-            referencedRelation: "businesses"
+            referencedRelation: aa_demo_businesses
             referencedColumns: ["id"]
           },
         ]
@@ -782,7 +782,7 @@ export type Database = {
             foreignKeyName: "edit_requests_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
-            referencedRelation: "businesses"
+            referencedRelation: aa_demo_businesses
             referencedColumns: ["id"]
           },
         ]
@@ -829,7 +829,7 @@ export type Database = {
             foreignKeyName: "generated_assets_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
-            referencedRelation: "businesses"
+            referencedRelation: aa_demo_businesses
             referencedColumns: ["id"]
           },
         ]
@@ -888,7 +888,7 @@ export type Database = {
             foreignKeyName: "hosting_payments_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
-            referencedRelation: "businesses"
+            referencedRelation: aa_demo_businesses
             referencedColumns: ["id"]
           },
         ]
@@ -956,7 +956,7 @@ export type Database = {
             foreignKeyName: "migration_jobs_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: aa_demo_users
             referencedColumns: ["id"]
           },
         ]
@@ -1142,7 +1142,7 @@ export type Database = {
             foreignKeyName: "onboarding_responses_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
-            referencedRelation: "businesses"
+            referencedRelation: aa_demo_businesses
             referencedColumns: ["id"]
           },
         ]
@@ -1228,7 +1228,7 @@ export type Database = {
             foreignKeyName: "prices_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: "products"
+            referencedRelation: aa_demo_products
             referencedColumns: ["id"]
           },
         ]
@@ -1317,7 +1317,7 @@ export type Database = {
             foreignKeyName: "subscriptions_price_id_fkey"
             columns: ["price_id"]
             isOneToOne: false
-            referencedRelation: "prices"
+            referencedRelation: aa_demo_prices
             referencedColumns: ["id"]
           },
         ]
@@ -1367,7 +1367,7 @@ export type Database = {
             foreignKeyName: "upsell_subscriptions_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
-            referencedRelation: "businesses"
+            referencedRelation: aa_demo_businesses
             referencedColumns: ["id"]
           },
         ]

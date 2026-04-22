@@ -53,7 +53,7 @@ export async function POST(
 
   // Record timestamp
   await supabaseAdminClient
-    .from('businesses')
+    .from('aa_demo_businesses')
     .update({ password_reset_sent_at: new Date().toISOString() } as any)
     .eq('user_id', userId);
 

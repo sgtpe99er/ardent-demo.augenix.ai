@@ -31,7 +31,7 @@ export async function POST(
 
   // Get business name for personalization
   const { data: business } = await supabaseAdminClient
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('business_name')
     .eq('user_id', userId)
     .maybeSingle();
@@ -57,7 +57,7 @@ export async function POST(
 
   // Record timestamp
   await supabaseAdminClient
-    .from('businesses')
+    .from('aa_demo_businesses')
     .update({ onboarding_link_sent_at: new Date().toISOString() } as any)
     .eq('user_id', userId);
 

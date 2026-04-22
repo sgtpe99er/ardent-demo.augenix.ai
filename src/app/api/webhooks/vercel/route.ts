@@ -68,14 +68,14 @@ export async function POST(req: NextRequest) {
     
     // Fetch business and user info to send the email
     const { data: siteInfo } = await supabaseAdmin
-      .from('deployed_websites')
+      .from('aa_demo_deployed_websites')
       .select('user_id, live_url')
       .eq('vercel_project_id', projectId)
       .maybeSingle();
       
     if (siteInfo?.user_id && updates.live_url) {
       const { data: businessInfo } = await supabaseAdmin
-        .from('businesses')
+        .from('aa_demo_businesses')
         .select('business_name')
         .eq('user_id', siteInfo.user_id)
         .maybeSingle();
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { error } = await supabaseAdmin
-    .from('deployed_websites')
+    .from('aa_demo_deployed_websites')
     .update(updates as Parameters<typeof supabaseAdmin.from>[0] extends never ? never : any)
     .eq('vercel_project_id', projectId);
 

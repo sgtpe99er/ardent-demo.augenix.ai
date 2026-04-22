@@ -4,8 +4,8 @@ import { supabaseAdminClient } from '@/libs/supabase/supabase-admin';
 import { getSession } from '@/features/account/controllers/get-session';
 import type { Tables } from '@/libs/supabase/types';
 
-type DeployedWebsite = Tables<'deployed_websites'>;
-type Business = Tables<'businesses'>;
+type DeployedWebsite = Tables<'aa_demo_deployed_websites'>;
+type Business = Tables<'aa_demo_businesses'>;
 
 export async function GET(request: NextRequest) {
   try {
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
 
     // Build query
     let query = supabase
-      .from('deployed_websites')
+      .from('aa_demo_deployed_websites')
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 
     // Get total count
     const { count } = await supabase
-      .from('deployed_websites')
+      .from('aa_demo_deployed_websites')
       .select('*', { count: 'exact', head: true })
       .in('status', (status ? status.split(',') : ['provisioning', 'building', 'built', 'deployed', 'failed']) as any);
 
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
       { data: businesses },
       { data: authUsers }
     ] = await Promise.all([
-      supabase.from('businesses').select('*'),
+      supabase.from('aa_demo_businesses').select('*'),
       supabaseAdminClient.auth.admin.listUsers()
     ]);
 

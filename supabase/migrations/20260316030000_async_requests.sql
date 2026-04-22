@@ -3,7 +3,7 @@
 
 create table async_requests (
   id uuid primary key default gen_random_uuid(),
-  business_id uuid references businesses(id) on delete cascade,
+  business_id uuid references aa_demo_businesses(id) on delete cascade,
   user_id uuid references auth.users(id) on delete cascade,
 
   -- Task classification

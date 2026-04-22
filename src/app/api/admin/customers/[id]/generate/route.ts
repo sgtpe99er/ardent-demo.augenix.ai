@@ -30,7 +30,7 @@ export async function POST(
 
   // Fetch the business + brand_assets required for generation input
   const { data: business, error: bizError } = await db
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select('id, business_name, industry, target_audience, services_products')
     .eq('user_id', userId)
     .single();
@@ -40,7 +40,7 @@ export async function POST(
   }
 
   const { data: brandAssets } = await db
-    .from('brand_assets')
+    .from('aa_demo_brand_assets')
     .select('has_existing_logo, existing_logo_url, has_brand_colors, brand_colors, style_preference, color_preference, existing_website_url')
     .eq('user_id', userId)
     .maybeSingle();
@@ -49,14 +49,14 @@ export async function POST(
   const assetTypes = ['logo', 'branding_guide', 'website_mockup', 'color_palette', 'font_selection'] as const;
   for (const assetType of assetTypes) {
     const { data: existing } = await db
-      .from('generated_assets')
+      .from('aa_demo_generated_assets')
       .select('id')
       .eq('user_id', userId)
       .eq('asset_type', assetType)
       .maybeSingle();
 
     if (!existing) {
-      await db.from('generated_assets').insert({
+      await db.from('aa_demo_generated_assets').insert({
         user_id: userId,
         business_id: (business as any).id,
         asset_type: assetType,
@@ -64,14 +64,14 @@ export async function POST(
       } as any);
     } else {
       await db
-        .from('generated_assets')
+        .from('aa_demo_generated_assets')
         .update({ status: 'generating', storage_url: null, updated_at: new Date().toISOString() } as any)
         .eq('id', (existing as any).id);
     }
   }
 
   await db
-    .from('businesses')
+    .from('aa_demo_businesses')
     .update({ status: 'assets_generating', updated_at: new Date().toISOString() } as any)
     .eq('user_id', userId);
 

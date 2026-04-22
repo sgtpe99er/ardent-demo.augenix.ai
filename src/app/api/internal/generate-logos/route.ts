@@ -276,7 +276,7 @@ export async function POST(request: NextRequest) {
 
   // 1. Fetch business context
   const { data: business, error: bizError } = await db
-    .from('businesses')
+    .from('aa_demo_businesses')
     .select(
       'id, user_id, business_name, industry, location_city, location_state, target_audience, services_products'
     )
@@ -289,7 +289,7 @@ export async function POST(request: NextRequest) {
 
   // 2. Fetch brand assets for color/style hints
   const { data: brandAssets } = await db
-    .from('brand_assets')
+    .from('aa_demo_brand_assets')
     .select('brand_colors, style_preference, color_preference')
     .eq('business_id', businessId)
     .maybeSingle();
@@ -425,7 +425,7 @@ export async function POST(request: NextRequest) {
 
       // 5. Create generated_assets record
       const { data: asset, error: insertError } = await db
-        .from('generated_assets')
+        .from('aa_demo_generated_assets')
         .insert({
           user_id: biz.user_id,
           business_id: businessId,
@@ -463,7 +463,7 @@ export async function POST(request: NextRequest) {
 
   // 6. Clean up any 'generating' placeholder records for this business
   const { error: cleanupError } = await db
-    .from('generated_assets')
+    .from('aa_demo_generated_assets')
     .delete()
     .eq('business_id', businessId)
     .eq('asset_type', 'logo')

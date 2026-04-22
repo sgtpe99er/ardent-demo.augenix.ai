@@ -43,7 +43,7 @@ export async function PATCH(
   }
 
   const { data, error } = await supabaseAdminClient
-    .from('async_requests')
+    .from('aa_demo_async_requests')
     .update(updateData as never)
     .eq('id', id)
     .select()

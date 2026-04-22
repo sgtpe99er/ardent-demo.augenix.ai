@@ -23,7 +23,7 @@ export async function POST(
   const { id } = await params;
 
   const { data: item, error: fetchError } = await supabaseAdminClient
-    .from('async_requests')
+    .from('aa_demo_async_requests')
     .select('id, status')
     .eq('id', id)
     .single();
@@ -43,7 +43,7 @@ export async function POST(
   const now = new Date().toISOString();
 
   const { data: updated, error: updateError } = await supabaseAdminClient
-    .from('async_requests')
+    .from('aa_demo_async_requests')
     .update({
       status: 'pending',
       claimed_by: null,
