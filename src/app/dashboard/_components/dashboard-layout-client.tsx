@@ -103,7 +103,7 @@ export function DashboardLayoutClient({ children, businessName, userEmail, imper
                   {(businessName || userEmail) && (
                     <div className='mb-3 px-3'>
                       {businessName && <div className='text-sm font-medium text-on-surface dark:text-white'>{businessName}</div>}
-                      {userEmail && <div className='text-xs text-on-surface-variant dark:text-neutral-500'>{userEmail}</div>
+                      {userEmail && <div className='text-xs text-on-surface-variant dark:text-neutral-500'>{userEmail}</div>}
                     </div>
                   )}
                   <SheetClose asChild>
