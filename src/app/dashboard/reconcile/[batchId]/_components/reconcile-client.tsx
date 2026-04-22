@@ -13,6 +13,13 @@ import {
   IoSparklesOutline,
 } from 'react-icons/io5';
 
+import {
+  applyProgressEvent,
+  consumeNdjson,
+  makeInitialSteps,
+  ReconcileProgress,
+  type StepState,
+} from '@/components/reconcile-progress';
 import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/utils/cn';
 
@@ -79,13 +86,19 @@ export function ReconcileClient({ batch, statement, invoices, matches, auditLogs
   const [running, setRunning] = useState(false);
   const [lineRunning, setLineRunning] = useState<string | null>(null);
   const [showAudit, setShowAudit] = useState(false);
+  const [steps, setSteps] = useState<StepState[]>(() => makeInitialSteps());
+  const [unfinalizing, setUnfinalizing] = useState(false);
 
   const systemTotal = invoices.reduce((sum, i) => sum + i.amount, 0);
   const hasResults = matches.length > 0;
+  const isFinalized = batch.status === 'complete';
 
   async function runReconcile(invoice_number?: string) {
     if (invoice_number) setLineRunning(invoice_number);
-    else setRunning(true);
+    else {
+      setRunning(true);
+      setSteps(makeInitialSteps());
+    }
     try {
       const res = await fetch('/api/reconcile', {
         method: 'POST',
@@ -96,6 +109,18 @@ export function ReconcileClient({ batch, statement, invoices, matches, auditLogs
         const err = await res.json().catch(() => ({ error: 'Unknown error' }));
         throw new Error(err.error ?? `HTTP ${res.status}`);
       }
+
+      let finalError: string | null = null;
+      await consumeNdjson(res, (event) => {
+        if (!invoice_number) {
+          setSteps((prev) => applyProgressEvent(prev, event as { type: string; step?: string }));
+        }
+        if (event.type === 'error') {
+          finalError = (event.error as string) ?? 'Reconciliation failed';
+        }
+      });
+
+      if (finalError) throw new Error(finalError);
       toast({ description: invoice_number ? 'Line re-reconciled.' : 'Reconciliation complete.' });
       router.refresh();
     } catch (err) {
@@ -106,6 +131,24 @@ export function ReconcileClient({ batch, statement, invoices, matches, auditLogs
     } finally {
       setRunning(false);
       setLineRunning(null);
+    }
+  }
+
+  async function unfinalize() {
+    if (!window.confirm('Un-finalize this batch? It will return to "needs review" and become editable again.')) return;
+    setUnfinalizing(true);
+    try {
+      const res = await fetch(`/api/reconcile/${batch.id}/unfinalize`, { method: 'POST' });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(err.error ?? `HTTP ${res.status}`);
+      }
+      toast({ description: 'Batch un-finalized. You can now re-run or edit.' });
+      router.refresh();
+    } catch (err) {
+      toast({ variant: 'destructive', description: `Failed: ${(err as Error).message}` });
+    } finally {
+      setUnfinalizing(false);
     }
   }
 
@@ -131,6 +174,17 @@ export function ReconcileClient({ batch, statement, invoices, matches, auditLogs
           </p>
         </div>
         <div className='flex flex-wrap items-center gap-2'>
+          {isFinalized && (
+            <button
+              type='button'
+              onClick={unfinalize}
+              disabled={unfinalizing || running}
+              className='inline-flex items-center gap-2 rounded-sm border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-medium text-amber-900 transition-colors hover:bg-amber-100 disabled:opacity-60 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200 dark:hover:bg-amber-950/60'
+            >
+              <IoAlertCircle className='h-4 w-4' />
+              {unfinalizing ? 'Un-finalizing…' : 'Un-finalize batch'}
+            </button>
+          )}
           {hasResults && (
             <a
               href={`/api/reconcile/${batch.id}/export`}
@@ -147,11 +201,11 @@ export function ReconcileClient({ batch, statement, invoices, matches, auditLogs
           >
             {running ? (
               <>
-                <IoSparklesOutline className='h-4 w-4 animate-pulse' /> Running 3-agent consensus…
+                <IoSparklesOutline className='h-4 w-4 animate-pulse' /> Running…
               </>
             ) : hasResults ? (
               <>
-                <IoRefresh className='h-4 w-4' /> Re-run reconciliation
+                <IoRefresh className='h-4 w-4' /> Re-Run All
               </>
             ) : (
               <>
@@ -161,6 +215,15 @@ export function ReconcileClient({ batch, statement, invoices, matches, auditLogs
           </button>
         </div>
       </div>
+
+      {running && (
+        <div className='mt-6'>
+          <ReconcileProgress
+            steps={steps}
+            heading={`${batch.vendor_name} · ${batch.period_start} → ${batch.period_end}`}
+          />
+        </div>
+      )}
 
       {/* Summary cards */}
       <div className='mt-8 grid gap-4 md:grid-cols-3'>
@@ -248,7 +311,7 @@ export function ReconcileClient({ batch, statement, invoices, matches, auditLogs
               onClick={() => setShowAudit((s) => !s)}
               className='text-xs font-medium uppercase tracking-wider text-on-surface-variant hover:text-on-surface dark:text-neutral-400 dark:hover:text-white'
             >
-              {showAudit ? 'Hide' : 'Show'} audit log ({auditLogs.length})
+              {showAudit ? 'Hide' : 'Show'} edit history ({auditLogs.length})
             </button>
           )}
         </div>
@@ -336,37 +399,99 @@ export function ReconcileClient({ batch, statement, invoices, matches, auditLogs
         )}
       </section>
 
-      {/* Audit log */}
+      {/* Edit history */}
       {showAudit && auditLogs.length > 0 && (
         <section className='mt-8'>
-          <h2 className='mb-2 font-serif text-lg text-on-surface dark:text-white'>Audit trail</h2>
-          <p className='mb-3 text-xs text-on-surface-variant dark:text-neutral-500'>
-            Every individual run and the final consensus are stored for traceability.
+          <h2 className='mb-1 font-serif text-lg text-on-surface dark:text-white'>Edit history</h2>
+          <p className='mb-4 text-xs text-on-surface-variant dark:text-neutral-500'>
+            Every reconciliation attempt is preserved — each shows the 3 parallel AI runs plus
+            the final consensus audit.
           </p>
-          <div className='space-y-3'>
-            {auditLogs.map((log) => (
-              <details
-                key={log.id}
-                className='rounded-sm border border-zinc-200 bg-white p-3 text-xs dark:border-zinc-800 dark:bg-zinc-950'
-              >
-                <summary className='flex cursor-pointer items-center justify-between'>
-                  <span className='font-mono font-semibold text-on-surface dark:text-white'>
-                    {log.run_label}
+          <ol className='space-y-6'>
+            {groupAuditLogs(auditLogs).map((attempt, idx, arr) => (
+              <li key={attempt.attemptKey} className='relative pl-6'>
+                <span className='absolute left-0 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-on-surface text-[10px] font-semibold text-white dark:bg-white dark:text-black'>
+                  {arr.length - idx}
+                </span>
+                <div className='flex items-baseline justify-between gap-4 border-b border-zinc-200 pb-2 dark:border-zinc-800'>
+                  <span className='font-serif text-sm font-medium text-on-surface dark:text-white'>
+                    Attempt {arr.length - idx}
                   </span>
-                  <span className='text-on-surface-variant dark:text-neutral-400'>
-                    {log.model} · {log.duration_ms ?? 0}ms · {new Date(log.created_at).toLocaleTimeString()}
+                  <span className='font-mono text-[11px] text-on-surface-variant dark:text-neutral-500'>
+                    {new Date(attempt.timestamp).toLocaleString()}
                   </span>
-                </summary>
-                <pre className='mt-2 max-h-80 overflow-auto whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-on-surface-variant dark:text-neutral-400'>
-                  {JSON.stringify(log.raw_output, null, 2)}
-                </pre>
-              </details>
+                </div>
+                <div className='mt-3 space-y-2'>
+                  {attempt.logs.map((log) => (
+                    <details
+                      key={log.id}
+                      className='rounded-sm border border-zinc-200 bg-white text-xs dark:border-zinc-800 dark:bg-zinc-950'
+                    >
+                      <summary className='flex cursor-pointer items-center justify-between px-3 py-2'>
+                        <span className='flex items-center gap-2'>
+                          <span
+                            className={cn(
+                              'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider',
+                              log.run_label === 'consensus'
+                                ? 'bg-on-surface text-white dark:bg-white dark:text-black'
+                                : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300'
+                            )}
+                          >
+                            {log.run_label}
+                          </span>
+                          <span className='font-mono text-[11px] text-on-surface-variant dark:text-neutral-400'>
+                            {log.model}
+                          </span>
+                        </span>
+                        <span className='font-mono text-[11px] text-on-surface-variant dark:text-neutral-500'>
+                          {log.duration_ms ? `${(log.duration_ms / 1000).toFixed(1)}s` : '—'}
+                        </span>
+                      </summary>
+                      <pre className='max-h-80 overflow-auto whitespace-pre-wrap border-t border-zinc-200 bg-zinc-50 p-3 font-mono text-[11px] leading-relaxed text-on-surface-variant dark:border-zinc-800 dark:bg-zinc-950 dark:text-neutral-400'>
+                        {JSON.stringify(log.raw_output, null, 2)}
+                      </pre>
+                    </details>
+                  ))}
+                </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </section>
       )}
     </div>
   );
+}
+
+/**
+ * Group audit rows into "attempts" — rows within 60 seconds of each other
+ * are treated as one reconciliation attempt (3 parallel runs + consensus).
+ * Most recent attempt is returned first.
+ */
+function groupAuditLogs(logs: AuditLog[]): {
+  attemptKey: string;
+  timestamp: string;
+  logs: AuditLog[];
+}[] {
+  const sorted = [...logs].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
+  const attempts: { attemptKey: string; timestamp: string; logs: AuditLog[] }[] = [];
+  const WINDOW_MS = 60_000;
+  for (const log of sorted) {
+    const t = new Date(log.created_at).getTime();
+    const last = attempts[attempts.length - 1];
+    if (last && Math.abs(new Date(last.timestamp).getTime() - t) < WINDOW_MS) {
+      last.logs.push(log);
+    } else {
+      attempts.push({ attemptKey: log.created_at, timestamp: log.created_at, logs: [log] });
+    }
+  }
+  // Sort each attempt's logs in canonical order (run_1, run_2, run_3, consensus)
+  const order = ['run_1', 'run_2', 'run_3', 'consensus'];
+  for (const a of attempts) {
+    a.logs.sort((x, y) => order.indexOf(x.run_label) - order.indexOf(y.run_label));
+  }
+  return attempts;
 }
 
 function Card({

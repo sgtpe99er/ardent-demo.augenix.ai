@@ -155,7 +155,17 @@ export interface RunReconciliationInput {
   invoices: ReconInvoice[];
 }
 
-export async function runReconciliation(input: RunReconciliationInput): Promise<ReconRunBundle> {
+export type ProgressEvent =
+  | { type: 'step_start'; step: string; model: string }
+  | { type: 'step_complete'; step: string; model: string; duration_ms: number }
+  | { type: 'step_error'; step: string; model: string; error: string };
+
+export type ProgressHandler = (event: ProgressEvent) => void | Promise<void>;
+
+export async function runReconciliation(
+  input: RunReconciliationInput,
+  onProgress?: ProgressHandler
+): Promise<ReconRunBundle> {
   const prompts = await loadPrompts();
 
   const userPrompt = fillTemplate(prompts.user, {
@@ -169,18 +179,35 @@ export async function runReconciliation(input: RunReconciliationInput): Promise<
 
   // 3 parallel runs across 3 different models (provider/architecture diversity).
   const runPromises = RUN_CONFIGS.map(async (cfg) => {
-    const { content, duration_ms } = await callGateway({
-      model: cfg.model,
-      system: prompts.system,
-      user: userPrompt,
-      temperature: cfg.temperature,
-    });
-    return {
-      label: cfg.label,
-      model: cfg.model,
-      result: parseJson<ReconResult>(content),
-      duration_ms,
-    };
+    await onProgress?.({ type: 'step_start', step: cfg.label, model: cfg.model });
+    try {
+      const { content, duration_ms } = await callGateway({
+        model: cfg.model,
+        system: prompts.system,
+        user: userPrompt,
+        temperature: cfg.temperature,
+      });
+      await onProgress?.({
+        type: 'step_complete',
+        step: cfg.label,
+        model: cfg.model,
+        duration_ms,
+      });
+      return {
+        label: cfg.label,
+        model: cfg.model,
+        result: parseJson<ReconResult>(content),
+        duration_ms,
+      };
+    } catch (err) {
+      await onProgress?.({
+        type: 'step_error',
+        step: cfg.label,
+        model: cfg.model,
+        error: (err as Error).message,
+      });
+      throw err;
+    }
   });
   const runs = await Promise.all(runPromises);
 
@@ -190,16 +217,33 @@ export async function runReconciliation(input: RunReconciliationInput): Promise<
     run2_json: JSON.stringify(runs[1].result),
     run3_json: JSON.stringify(runs[2].result),
   });
-  const consensusResp = await callGateway({
-    model: CONSENSUS_MODEL,
-    user: consensusUser,
-    temperature: CONSENSUS_TEMPERATURE,
-  });
-  const consensus = {
-    model: CONSENSUS_MODEL,
-    result: parseJson<ReconResult>(consensusResp.content),
-    duration_ms: consensusResp.duration_ms,
-  };
+  await onProgress?.({ type: 'step_start', step: 'consensus', model: CONSENSUS_MODEL });
+  try {
+    const consensusResp = await callGateway({
+      model: CONSENSUS_MODEL,
+      user: consensusUser,
+      temperature: CONSENSUS_TEMPERATURE,
+    });
+    await onProgress?.({
+      type: 'step_complete',
+      step: 'consensus',
+      model: CONSENSUS_MODEL,
+      duration_ms: consensusResp.duration_ms,
+    });
+    const consensus = {
+      model: CONSENSUS_MODEL,
+      result: parseJson<ReconResult>(consensusResp.content),
+      duration_ms: consensusResp.duration_ms,
+    };
 
-  return { runs, consensus };
+    return { runs, consensus };
+  } catch (err) {
+    await onProgress?.({
+      type: 'step_error',
+      step: 'consensus',
+      model: CONSENSUS_MODEL,
+      error: (err as Error).message,
+    });
+    throw err;
+  }
 }
