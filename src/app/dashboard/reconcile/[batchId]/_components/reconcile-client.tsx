@@ -6,13 +6,18 @@ import { useState } from 'react';
 import {
   IoAlertCircle,
   IoArrowBack,
+  IoArrowForwardOutline,
+  IoCardOutline,
   IoCheckmarkCircle,
   IoCloseOutline,
+  IoCloudUploadOutline,
   IoCreateOutline,
   IoDownloadOutline,
+  IoLockClosed,
   IoPersonCircleOutline,
   IoPlayCircle,
   IoRefresh,
+  IoShieldCheckmarkOutline,
   IoSparklesOutline,
 } from 'react-icons/io5';
 
@@ -25,6 +30,8 @@ import {
 } from '@/components/reconcile-progress';
 import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/utils/cn';
+
+import { CheckRunModal, FinalizeModal, SyncToNexsyisModal } from './finalize-modals';
 
 export interface ReconcileInvoice {
   invoice_number: string;
@@ -55,6 +62,10 @@ export interface ReconcileBatch {
   summary: string | null;
   match_rate: number | null;
   warnings: string[];
+  finalized_at: string | null;
+  finalized_by: string | null;
+  nexsyis_sync_id: string | null;
+  nexsyis_synced_at: string | null;
 }
 
 export interface ReconcileStatement {
@@ -112,10 +123,17 @@ export function ReconcileClient({
   const [steps, setSteps] = useState<StepState[]>(() => makeInitialSteps());
   const [unfinalizing, setUnfinalizing] = useState(false);
   const [editingRow, setEditingRow] = useState<ReconcileMatch | null>(null);
+  const [showFinalizeModal, setShowFinalizeModal] = useState(false);
+  const [showSyncModal, setShowSyncModal] = useState(false);
+  const [showCheckRunModal, setShowCheckRunModal] = useState(false);
 
   const systemTotal = invoices.reduce((sum, i) => sum + i.amount, 0);
   const hasResults = matches.length > 0;
-  const isFinalized = batch.status === 'complete';
+  const isFinalized = Boolean(batch.finalized_at);
+  const canFinalize = hasResults && !isFinalized && batch.status !== 'running' && batch.status !== 'pending';
+  const matchedCount = matches.filter((m) => m.status === 'matched').length;
+  const flaggedCount = matches.filter((m) => m.status === 'flagged').length;
+  const netVariance = matches.reduce((sum, m) => sum + m.difference, 0);
 
   async function runReconcile(invoice_number?: string) {
     if (invoice_number) setLineRunning(invoice_number);
@@ -205,7 +223,7 @@ export function ReconcileClient({
               disabled={unfinalizing || running}
               className='inline-flex items-center gap-2 rounded-sm border border-amber-300 bg-amber-50 px-4 py-2 text-sm font-medium text-amber-900 transition-colors hover:bg-amber-100 disabled:opacity-60 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200 dark:hover:bg-amber-950/60'
             >
-              <IoAlertCircle className='h-4 w-4' />
+              <IoLockClosed className='h-4 w-4' />
               {unfinalizing ? 'Un-finalizing…' : 'Un-finalize batch'}
             </button>
           )}
@@ -217,26 +235,39 @@ export function ReconcileClient({
               <IoDownloadOutline className='h-4 w-4' /> Export CSV
             </a>
           )}
-          <button
-            type='button'
-            onClick={() => runReconcile()}
-            disabled={running || !statement}
-            className='inline-flex items-center gap-2 rounded-sm bg-on-surface px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-on-surface/90 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-zinc-200'
-          >
-            {running ? (
-              <>
-                <IoSparklesOutline className='h-4 w-4 animate-pulse' /> Running…
-              </>
-            ) : hasResults ? (
-              <>
-                <IoRefresh className='h-4 w-4' /> Re-Run All
-              </>
-            ) : (
-              <>
-                <IoPlayCircle className='h-4 w-4' /> Run reconciliation
-              </>
-            )}
-          </button>
+          {!isFinalized && (
+            <button
+              type='button'
+              onClick={() => runReconcile()}
+              disabled={running || !statement}
+              className='inline-flex items-center gap-2 rounded-sm border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-on-surface transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:hover:bg-zinc-900'
+            >
+              {running ? (
+                <>
+                  <IoSparklesOutline className='h-4 w-4 animate-pulse' /> Running…
+                </>
+              ) : hasResults ? (
+                <>
+                  <IoRefresh className='h-4 w-4' /> Re-Run All
+                </>
+              ) : (
+                <>
+                  <IoPlayCircle className='h-4 w-4' /> Run reconciliation
+                </>
+              )}
+            </button>
+          )}
+          {canFinalize && (
+            <button
+              type='button'
+              onClick={() => setShowFinalizeModal(true)}
+              disabled={running}
+              className='inline-flex items-center gap-2 rounded-sm bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60'
+            >
+              <IoLockClosed className='h-4 w-4' />
+              Finalize batch
+            </button>
+          )}
         </div>
       </div>
 
@@ -246,6 +277,60 @@ export function ReconcileClient({
             steps={steps}
             heading={`${batch.vendor_name} · ${batch.period_start} → ${batch.period_end}`}
           />
+        </div>
+      )}
+
+      {isFinalized && (
+        <div className='mt-6 rounded-sm border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-900 dark:bg-emerald-950/30'>
+          <div className='flex flex-wrap items-start justify-between gap-4'>
+            <div className='flex items-start gap-3'>
+              <IoShieldCheckmarkOutline className='mt-0.5 h-6 w-6 text-emerald-600 dark:text-emerald-400' />
+              <div>
+                <p className='font-serif text-lg font-medium text-on-surface dark:text-white'>
+                  Batch finalized · {matches.length} invoices ready for payment
+                </p>
+                <p className='mt-1 text-xs text-on-surface-variant dark:text-neutral-400'>
+                  Finalized by {batch.finalized_by ?? 'unknown'} on{' '}
+                  {batch.finalized_at ? new Date(batch.finalized_at).toLocaleString() : '—'}
+                  {batch.nexsyis_sync_id && (
+                    <>
+                      {' · Nexsyis transaction '}
+                      <span className='font-mono text-on-surface dark:text-white'>
+                        {batch.nexsyis_sync_id}
+                      </span>
+                    </>
+                  )}
+                </p>
+              </div>
+            </div>
+            <div className='flex flex-wrap gap-2'>
+              {!batch.nexsyis_sync_id && (
+                <button
+                  type='button'
+                  onClick={() => setShowSyncModal(true)}
+                  className='inline-flex items-center gap-1.5 rounded-sm bg-on-surface px-3 py-1.5 text-xs font-semibold text-white hover:bg-on-surface/90 dark:bg-white dark:text-black dark:hover:bg-zinc-200'
+                >
+                  <IoCloudUploadOutline className='h-4 w-4' />
+                  Sync to Nexsyis
+                </button>
+              )}
+              <button
+                type='button'
+                onClick={() => setShowCheckRunModal(true)}
+                className='inline-flex items-center gap-1.5 rounded-sm border border-zinc-300 bg-white px-3 py-1.5 text-xs font-semibold text-on-surface hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:hover:bg-zinc-900'
+              >
+                <IoCardOutline className='h-4 w-4' />
+                Start check run
+              </button>
+              <Link
+                href='/dashboard'
+                className='inline-flex items-center gap-1.5 rounded-sm border border-zinc-300 bg-white px-3 py-1.5 text-xs font-semibold text-on-surface hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:hover:bg-zinc-900'
+              >
+                Back to statements
+                <IoArrowForwardOutline className='h-4 w-4' />
+              </Link>
+            </div>
+          </div>
         </div>
       )}
 
@@ -335,7 +420,7 @@ export function ReconcileClient({
               onClick={() => setShowAudit((s) => !s)}
               className='text-xs font-medium uppercase tracking-wider text-on-surface-variant hover:text-on-surface dark:text-neutral-400 dark:hover:text-white'
             >
-              {showAudit ? 'Hide' : 'Show'} edit history ({auditLogs.length + overrides.length})
+              {showAudit ? 'Hide' : 'Show'} edit history
             </button>
           )}
         </div>
@@ -447,6 +532,9 @@ export function ReconcileClient({
           <ol className='space-y-6'>
             {buildHistoryTimeline(auditLogs, overrides).map((entry, idx, arr) => {
               const numLabel = arr.length - idx;
+              if (entry.kind === 'event') {
+                return <EventEntryRow key={entry.key} log={entry.log} />;
+              }
               if (entry.kind === 'attempt') {
                 return (
                   <li key={entry.key} className='relative pl-6'>
@@ -571,19 +659,64 @@ export function ReconcileClient({
           }}
         />
       )}
+
+      {showFinalizeModal && (
+        <FinalizeModal
+          batchId={batch.id}
+          vendorName={batch.vendor_name}
+          periodStart={batch.period_start}
+          periodEnd={batch.period_end}
+          matchRate={batch.match_rate}
+          matchedCount={matchedCount}
+          flaggedCount={flaggedCount}
+          overrideCount={overrides.length}
+          netVariance={netVariance}
+          warnings={batch.warnings}
+          onClose={() => setShowFinalizeModal(false)}
+          onFinalized={() => {
+            setShowFinalizeModal(false);
+            router.refresh();
+            toast({ description: 'Batch finalized. Invoices are now ready for payment.' });
+          }}
+        />
+      )}
+
+      {showSyncModal && (
+        <SyncToNexsyisModal
+          batchId={batch.id}
+          vendorName={batch.vendor_name}
+          invoiceCount={matches.length}
+          onClose={() => setShowSyncModal(false)}
+          onSynced={() => {
+            setShowSyncModal(false);
+            router.refresh();
+          }}
+        />
+      )}
+
+      {showCheckRunModal && (
+        <CheckRunModal
+          vendorName={batch.vendor_name}
+          matches={matches}
+          onClose={() => setShowCheckRunModal(false)}
+        />
+      )}
     </div>
   );
 }
 
 type TimelineEntry =
   | { kind: 'attempt'; key: string; timestamp: string; logs: AuditLog[] }
-  | { kind: 'override'; key: string; timestamp: string; override: HumanOverride };
+  | { kind: 'override'; key: string; timestamp: string; override: HumanOverride }
+  | { kind: 'event'; key: string; timestamp: string; log: AuditLog };
 
 /**
  * Build a merged, reverse-chronological timeline of AI reconciliation
  * attempts and human overrides. AI rows written within 60 seconds of each
  * other are grouped into a single attempt (3 parallel runs + consensus).
  */
+const AI_RUN_LABELS = new Set(['run_1', 'run_2', 'run_3', 'consensus']);
+
 function buildHistoryTimeline(
   logs: AuditLog[],
   overrides: HumanOverride[]
@@ -591,8 +724,11 @@ function buildHistoryTimeline(
   const WINDOW_MS = 60_000;
   const ATTEMPT_ORDER = ['run_1', 'run_2', 'run_3', 'consensus'];
 
-  // 1) Group audit logs into attempts (oldest-first while grouping).
-  const ascending = [...logs].sort(
+  const aiLogs = logs.filter((l) => AI_RUN_LABELS.has(l.run_label));
+  const eventLogs = logs.filter((l) => !AI_RUN_LABELS.has(l.run_label));
+
+  // 1) Group AI audit logs into attempts (oldest-first while grouping).
+  const ascending = [...aiLogs].sort(
     (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
   );
   const attempts: TimelineEntry[] = [];
@@ -620,6 +756,14 @@ function buildHistoryTimeline(
     }
   }
 
+  // 1b) Lifecycle events (finalize / unfinalize / nexsyis_sync).
+  const eventEntries: TimelineEntry[] = eventLogs.map((log) => ({
+    kind: 'event',
+    key: `event-${log.id}`,
+    timestamp: log.created_at,
+    log,
+  }));
+
   // 2) Map overrides.
   const overrideEntries: TimelineEntry[] = overrides.map((o) => ({
     kind: 'override',
@@ -629,8 +773,97 @@ function buildHistoryTimeline(
   }));
 
   // 3) Merge and sort descending (most recent first).
-  return [...attempts, ...overrideEntries].sort(
+  return [...attempts, ...overrideEntries, ...eventEntries].sort(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  );
+}
+
+interface EventMeta {
+  title: string;
+  detail: string;
+  dotClass: string;
+  rowClass: string;
+}
+
+function describeEventLog(log: AuditLog): EventMeta {
+  const raw = (log.raw_output ?? {}) as Record<string, unknown>;
+  const user =
+    (raw.finalized_by as string) ??
+    (raw.unfinalized_by as string) ??
+    (raw.synced_by as string) ??
+    'unknown';
+  if (log.run_label === 'finalize') {
+    const count = (raw.invoice_count as number) ?? 0;
+    return {
+      title: 'Batch finalized',
+      detail: `${user} · ${count} invoices marked ready-to-pay`,
+      dotClass: 'bg-emerald-600 text-white',
+      rowClass:
+        'border-emerald-200 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-950/30',
+    };
+  }
+  if (log.run_label === 'unfinalize') {
+    return {
+      title: 'Batch un-finalized',
+      detail: `${user} · invoices returned to unpaid`,
+      dotClass: 'bg-amber-500 text-white',
+      rowClass:
+        'border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30',
+    };
+  }
+  if (log.run_label === 'nexsyis_sync') {
+    const id = (raw.nexsyis_sync_id as string) ?? '—';
+    return {
+      title: 'Synced to Nexsyis',
+      detail: `${user} · transaction ${id}`,
+      dotClass: 'bg-blue-600 text-white',
+      rowClass: 'border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/30',
+    };
+  }
+  return {
+    title: log.run_label,
+    detail: '',
+    dotClass: 'bg-zinc-500 text-white',
+    rowClass: 'border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900',
+  };
+}
+
+function EventEntryRow({ log }: { log: AuditLog }) {
+  const meta = describeEventLog(log);
+  return (
+    <li className='relative pl-6'>
+      <span
+        className={cn(
+          'absolute left-0 top-1 flex h-5 w-5 items-center justify-center rounded-full',
+          meta.dotClass
+        )}
+      >
+        {log.run_label === 'finalize' ? (
+          <IoLockClosed className='h-3 w-3' />
+        ) : log.run_label === 'nexsyis_sync' ? (
+          <IoCloudUploadOutline className='h-3 w-3' />
+        ) : (
+          <IoAlertCircle className='h-3 w-3' />
+        )}
+      </span>
+      <div
+        className={cn('rounded-sm border px-4 py-3 text-sm', meta.rowClass)}
+      >
+        <div className='flex items-baseline justify-between gap-4'>
+          <span className='font-serif text-sm font-medium text-on-surface dark:text-white'>
+            {meta.title}
+            {meta.detail && (
+              <span className='ml-2 font-sans text-xs font-normal text-on-surface-variant dark:text-neutral-400'>
+                {meta.detail}
+              </span>
+            )}
+          </span>
+          <span className='font-mono text-[11px] text-on-surface-variant dark:text-neutral-500'>
+            {new Date(log.created_at).toLocaleString()}
+          </span>
+        </div>
+      </div>
+    </li>
   );
 }
 

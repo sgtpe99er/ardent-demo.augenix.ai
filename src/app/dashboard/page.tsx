@@ -15,7 +15,7 @@ export default async function DashboardPage() {
   const { data: batchesRaw } = await supabase
     .from('aa_demo_reconciliation_batches' as never)
     .select(
-      'id, vendor_id, period_start, period_end, status, match_rate, summary, aa_demo_vendors(vendor_name)'
+      'id, vendor_id, period_start, period_end, status, match_rate, summary, finalized_at, nexsyis_sync_id, aa_demo_vendors(vendor_name)'
     )
     .order('created_at', { ascending: false });
 
@@ -41,6 +41,8 @@ export default async function DashboardPage() {
       match_rate: b.match_rate != null ? Number(b.match_rate) : null,
       summary: (b.summary as string) ?? null,
       vendor_name: (b.aa_demo_vendors?.vendor_name as string) ?? 'Unknown vendor',
+      finalized_at: (b.finalized_at as string | null) ?? null,
+      nexsyis_sync_id: (b.nexsyis_sync_id as string | null) ?? null,
       statement_total: s ? Number(s.total_amount) : null,
     };
   });

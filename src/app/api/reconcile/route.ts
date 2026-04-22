@@ -194,12 +194,19 @@ export async function POST(request: Request) {
           await admin
             .from('aa_demo_reconciliation_batches')
             .update({
-              status: 'complete',
+              // Reconciliation finishes in needs_review; the Office Manager
+              // must explicitly click Finalize to lock the batch and mark
+              // invoices ready for payment.
+              status: 'needs_review',
               summary: bundle.consensus.result.summary,
               match_rate: bundle.consensus.result.overall_match_rate,
               warnings: bundle.consensus.result.warnings as any,
               consensus: bundle.consensus.result as any,
               run_at: new Date().toISOString(),
+              finalized_at: null,
+              finalized_by: null,
+              nexsyis_sync_id: null,
+              nexsyis_synced_at: null,
             })
             .eq('id', batchId);
         }

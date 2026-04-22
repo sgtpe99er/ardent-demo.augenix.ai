@@ -28,13 +28,46 @@ export async function POST(
   }
 
   const admin = supabaseAdminClient;
-  const { error } = await admin
-    .from('aa_demo_reconciliation_batches')
-    .update({ status: 'needs_review' })
-    .eq('id', batchId);
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  // Revert batch state.
+  const { data: batch, error } = await admin
+    .from('aa_demo_reconciliation_batches')
+    .update({
+      status: 'needs_review',
+      finalized_at: null,
+      finalized_by: null,
+      nexsyis_sync_id: null,
+      nexsyis_synced_at: null,
+    })
+    .eq('id', batchId)
+    .select('vendor_id, period_start, period_end')
+    .maybeSingle();
+
+  if (error || !batch) {
+    return NextResponse.json({ error: error?.message ?? 'Batch not found' }, { status: 500 });
   }
+
+  // Flip invoices back to unpaid.
+  await admin
+    .from('aa_demo_invoices')
+    .update({ status: 'unpaid' })
+    .eq('vendor_id', batch.vendor_id)
+    .gte('invoice_date', batch.period_start)
+    .lte('invoice_date', batch.period_end);
+
+  // Audit row so the un-finalize shows up in edit history.
+  await admin.from('aa_demo_audit_logs').insert([
+    {
+      batch_id: batchId,
+      run_label: 'unfinalize',
+      model: null,
+      duration_ms: null,
+      raw_output: {
+        unfinalized_by: session.user.email ?? 'unknown',
+        unfinalized_at: new Date().toISOString(),
+      } as any,
+    },
+  ]);
+
   return NextResponse.json({ ok: true });
 }

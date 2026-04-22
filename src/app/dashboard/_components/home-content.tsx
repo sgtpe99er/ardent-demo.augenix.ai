@@ -28,6 +28,8 @@ interface Batch {
   match_rate: number | null;
   summary: string | null;
   vendor_name: string;
+  finalized_at?: string | null;
+  nexsyis_sync_id?: string | null;
   statement_total: number | null;
 }
 
@@ -43,7 +45,22 @@ function greeting() {
   return 'Good evening';
 }
 
-function StatusPill({ status, matchRate }: { status: string; matchRate: number | null }) {
+function StatusPill({
+  status,
+  matchRate,
+  finalized,
+}: {
+  status: string;
+  matchRate: number | null;
+  finalized?: boolean;
+}) {
+  if (status === 'complete' && finalized) {
+    return (
+      <span className='inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-0.5 text-xs font-medium text-white'>
+        <IoCheckmarkCircle /> Finalized · {(matchRate ?? 0).toFixed(0)}%
+      </span>
+    );
+  }
   if (status === 'complete') {
     const ok = (matchRate ?? 0) >= 95;
     return (
@@ -318,7 +335,11 @@ function BatchGrid({
             <span className='font-serif text-lg text-on-surface dark:text-white'>
               {b.vendor_name}
             </span>
-            <StatusPill status={b.status} matchRate={b.match_rate} />
+            <StatusPill
+              status={b.status}
+              matchRate={b.match_rate}
+              finalized={Boolean(b.finalized_at)}
+            />
           </div>
           <div className='mt-2 text-xs uppercase tracking-wider text-on-surface-variant dark:text-neutral-400'>
             {b.period_start} → {b.period_end}

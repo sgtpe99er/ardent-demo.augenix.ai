@@ -78,6 +78,10 @@ export default async function ReconcileBatchPage({ params }: PageProps) {
         summary: batch.summary,
         match_rate: batch.match_rate != null ? Number(batch.match_rate) : null,
         warnings: Array.isArray(batch.warnings) ? batch.warnings : [],
+        finalized_at: batch.finalized_at ?? null,
+        finalized_by: batch.finalized_by ?? null,
+        nexsyis_sync_id: batch.nexsyis_sync_id ?? null,
+        nexsyis_synced_at: batch.nexsyis_synced_at ?? null,
       }}
       statement={
         statementRaw
