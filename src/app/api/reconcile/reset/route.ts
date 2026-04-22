@@ -4,8 +4,9 @@
  * Resets all reconciliation state back to the original seeded "pending"
  * state so the demo can be run again from scratch.
  *
- * Safe to call repeatedly. Only touches reconciliation tables; vendors,
- * invoices, and statements remain untouched.
+ * Safe to call repeatedly. Vendors and statements are untouched. Invoice
+ * rows stay, but any invoices that were flipped to "ready_to_pay" by a
+ * finalize are reverted to "unpaid" so the demo starts clean.
  */
 import { NextResponse } from 'next/server';
 
@@ -27,6 +28,12 @@ export async function POST() {
   await admin.from('aa_demo_audit_logs').delete().gte('id', 0);
   await admin.from('aa_demo_reconciliation_matches').delete().gte('id', 0);
   await admin.from('aa_demo_reconciliation_batches').delete().gte('id', 0);
+
+  // Revert any "ready_to_pay" invoices (set by finalize) back to unpaid.
+  await admin
+    .from('aa_demo_invoices')
+    .update({ status: 'unpaid' })
+    .eq('status', 'ready_to_pay');
 
   // Re-create one pending batch per vendor for the standard demo period.
   const { data: vendors, error: vendorErr } = await admin
