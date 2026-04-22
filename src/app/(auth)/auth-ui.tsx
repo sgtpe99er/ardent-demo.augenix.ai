@@ -2,9 +2,6 @@
 
 import { FormEvent, useState } from 'react';
 import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { toast } from '@/components/ui/use-toast';
 import { ActionResponse } from '@/types/action-response';
 
 export function AuthUI({
@@ -23,20 +20,16 @@ export function AuthUI({
 
     const response = await signInWithPassword(email, password);
     if (response?.error) {
-      toast({
-        variant: 'destructive',
-        description: response.error.message || 'An error occurred. Please try again.',
-      });
       setPending(false);
     }
     // On success the server redirects
   }
 
   return (
-    <section className='flex w-full max-w-md flex-col gap-8 rounded-sm bg-white p-12 text-center' style={{ backgroundColor: '#ffffff' }}>
-      <div className='flex justify-center'>
+    <section className='flex w-full max-w-sm flex-col gap-6 rounded-sm bg-white p-10 text-center' style={{ backgroundColor: '#ffffff' }}>
+      <div className='flex justify-center mb-2'>
         <Image
-          src='/ARD_LogoRed_LTypeBlack.png'
+          src='/client-logo.png'
           alt='Logo'
           width={200}
           height={60}
@@ -44,7 +37,6 @@ export function AuthUI({
           priority
         />
       </div>
-      <h1 className='text-2xl font-medium' style={{ color: '#191c1e' }}>Sign In</h1>
       <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
         <input
           type='email'

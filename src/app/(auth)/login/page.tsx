@@ -13,8 +13,8 @@ export default async function LoginPage() {
   }
 
   return (
-    <section className='flex min-h-screen items-center justify-center p-6' style={{ backgroundColor: '#f7f9fb' }}>
+    <div className='flex min-h-screen items-start justify-center p-6 pt-48'>
       <AuthUI signInWithPassword={signInWithPassword} />
-    </section>
+    </div>
   );
 }

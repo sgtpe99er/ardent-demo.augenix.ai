@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 
 import { getSession } from '@/features/account/controllers/get-session';
 
-import { signInWithMagicLink, signUpWithPassword, signInWithPassword, resetPassword } from '../(auth)/auth-actions';
+import { signInWithPassword } from '../(auth)/auth-actions';
 import { AuthUI } from '../(auth)/auth-ui';
 
 export default async function HomePage() {
@@ -13,14 +13,8 @@ export default async function HomePage() {
   }
 
   return (
-    <section className='py-xl m-auto flex h-full max-w-lg items-center'>
-      <AuthUI
-        mode='login'
-        signInWithMagicLink={signInWithMagicLink}
-        signUpWithPassword={signUpWithPassword}
-        signInWithPassword={signInWithPassword}
-        resetPassword={resetPassword}
-      />
-    </section>
+    <div className='flex min-h-screen items-start justify-center p-6 pt-48'>
+      <AuthUI signInWithPassword={signInWithPassword} />
+    </div>
   );
 }
