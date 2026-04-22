@@ -143,7 +143,7 @@ export function ReconcileClient({ batch, statement, invoices, matches, auditLogs
             type='button'
             onClick={() => runReconcile()}
             disabled={running || !statement}
-            className='inline-flex items-center gap-2 rounded-sm bg-on-surface px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-on-surface/90 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-on-surface dark:hover:bg-zinc-200'
+            className='inline-flex items-center gap-2 rounded-sm bg-on-surface px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-on-surface/90 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-zinc-200'
           >
             {running ? (
               <>

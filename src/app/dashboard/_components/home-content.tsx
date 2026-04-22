@@ -1,7 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { IoCheckmarkCircle, IoAlertCircle, IoTimeOutline } from 'react-icons/io5';
+import {
+  IoAlertCircle,
+  IoCheckmarkCircle,
+  IoHelpCircleOutline,
+  IoTimeOutline,
+} from 'react-icons/io5';
 
 interface Batch {
   id: number;
@@ -71,9 +76,18 @@ export function HomeContent({ userEmail, batches }: HomeContentProps) {
 
   return (
     <div className='py-2 lg:py-3'>
-      <h1 className='font-serif text-3xl font-normal leading-[1.05] tracking-tight text-on-surface dark:text-white lg:text-5xl'>
-        Vendor Statement Reconciliation
-      </h1>
+      <div className='flex flex-wrap items-start justify-between gap-4'>
+        <h1 className='font-serif text-3xl font-normal leading-[1.05] tracking-tight text-on-surface dark:text-white lg:text-5xl'>
+          Vendor Statement Reconciliation
+        </h1>
+        <Link
+          href='/dashboard/help'
+          className='inline-flex items-center gap-1.5 rounded-sm border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-on-surface transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:hover:bg-zinc-900'
+        >
+          <IoHelpCircleOutline className='h-4 w-4' />
+          How it works
+        </Link>
+      </div>
       <p className='mt-4 max-w-2xl text-sm leading-relaxed text-on-surface-variant dark:text-neutral-400'>
         Select a vendor statement below to run the three-agent consensus reconciliation against
         your Nexsyis invoices.

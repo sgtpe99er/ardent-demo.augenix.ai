@@ -150,6 +150,43 @@
   }
 }
 
+/* Button readability guarantee: any button (or link styled as one) with a
+   dark background must keep its text visible. This prevents downstream
+   contrast-override utilities from inverting white text to black and
+   producing invisible labels. Declared outside @layer so Tailwind does not
+   merge these tag+class selectors with generated variant selectors. */
+button.bg-black,
+button.bg-zinc-900,
+button.bg-zinc-950,
+button.bg-neutral-900,
+button.bg-neutral-950,
+button.bg-on-surface,
+button.bg-foreground,
+button.bg-primary,
+a.bg-black,
+a.bg-zinc-900,
+a.bg-zinc-950,
+a.bg-neutral-900,
+a.bg-neutral-950,
+a.bg-on-surface,
+a.bg-foreground,
+a.bg-primary {
+  color: #ffffff !important;
+}
+
+button.bg-white,
+button.bg-zinc-50,
+button.bg-zinc-100,
+button.bg-neutral-50,
+button.bg-neutral-100,
+a.bg-white,
+a.bg-zinc-50,
+a.bg-zinc-100,
+a.bg-neutral-50,
+a.bg-neutral-100 {
+  color: #000000 !important;
+}
+
 @layer utilities {
   /* Global light mode contrast fixes - auto-applied without special class */
   html:not(.dark) .text-neutral-400,
@@ -212,7 +249,6 @@
   .dash-contrast .text-zinc-600,
   .dash-contrast .text-zinc-700,
   .dash-contrast .text-zinc-800,
-  .dash-contrast .text-white,
   .dash-contrast .text-muted-foreground,
   .dash-contrast .placeholder-neutral-500,
   .dash-contrast .placeholder-neutral-400,
@@ -265,10 +301,6 @@
 
   .dash-contrast [class*='hover:bg-black/']:hover {
     background-color: hsl(var(--card)) !important;
-  }
-
-  .dash-contrast .hover\:text-white:hover {
-    @apply text-foreground;
   }
 
   .dash-contrast .border-zinc-800,

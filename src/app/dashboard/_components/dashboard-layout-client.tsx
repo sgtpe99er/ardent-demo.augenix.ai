@@ -69,7 +69,7 @@ export function DashboardLayoutClient({ children, businessName, userEmail, imper
         </div>
         <div className='flex h-16 items-center justify-between'>
           <div className='flex items-center gap-4'>
-            <Link href='/' className='flex-shrink-0'>
+            <Link href='/' className='flex items-center gap-0 flex-shrink-0'>
               <Image
                 src='/client-logo.png'
                 alt='Ardent'
@@ -78,6 +78,7 @@ export function DashboardLayoutClient({ children, businessName, userEmail, imper
                 priority
                 className='h-9 w-auto object-contain'
               />
+              <span className='font-semibold text-lg ml-1 relative bottom-0.5'>AI</span>
             </Link>
           </div>
           <div className='flex items-center gap-2 pr-4 lg:pr-8'>
@@ -128,7 +129,7 @@ export function DashboardLayoutClient({ children, businessName, userEmail, imper
                         className={cn(
                           'rounded-sm px-3 py-1.5 text-xs font-medium transition-colors',
                           preference === t
-                            ? 'bg-on-surface text-white dark:bg-white dark:text-on-surface'
+                            ? 'bg-on-surface text-white dark:bg-white dark:text-black'
                             : 'text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface dark:text-neutral-400 dark:hover:bg-zinc-900 dark:hover:text-white'
                         )}
                       >

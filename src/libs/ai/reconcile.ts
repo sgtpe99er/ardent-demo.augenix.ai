@@ -10,9 +10,27 @@ import path from 'node:path';
 const AI_GATEWAY_API_KEY = process.env.AI_GATEWAY_API_KEY;
 const AI_GATEWAY_BASE_URL = 'https://ai-gateway.vercel.sh/v1';
 
-// Models - use strong reasoning models for runs; a slightly heavier one for consensus
-const RUN_MODEL = process.env.AA_RECON_RUN_MODEL ?? 'openai/gpt-4.1-mini';
-const CONSENSUS_MODEL = process.env.AA_RECON_CONSENSUS_MODEL ?? 'openai/gpt-4.1';
+// Cost-optimized 3-run + consensus setup (~2-4¢ per full reconciliation).
+// Each run uses a different model for provider/architecture diversity.
+const RUN_CONFIGS: { model: string; temperature: number; label: string }[] = [
+  {
+    label: 'run_1',
+    model: process.env.AA_RECON_RUN_1_MODEL ?? 'xai/grok-4-fast-non-reasoning',
+    temperature: 0.0,
+  },
+  {
+    label: 'run_2',
+    model: process.env.AA_RECON_RUN_2_MODEL ?? 'google/gemini-3-flash',
+    temperature: 0.1,
+  },
+  {
+    label: 'run_3',
+    model: process.env.AA_RECON_RUN_3_MODEL ?? 'xai/grok-4.20-multi-agent',
+    temperature: 0.2,
+  },
+];
+const CONSENSUS_MODEL = process.env.AA_RECON_CONSENSUS_MODEL ?? 'xai/grok-4-fast-non-reasoning';
+const CONSENSUS_TEMPERATURE = 0.0;
 
 export interface ReconInvoice {
   invoice_number: string;
@@ -139,19 +157,17 @@ export async function runReconciliation(input: RunReconciliationInput): Promise<
     statement_text: input.statement_text,
   });
 
-  // 3 parallel runs with slightly varied temperatures to encourage
-  // independent reasoning paths while keeping output deterministic-ish.
-  const runTemps = [0.1, 0.3, 0.5];
-  const runPromises = runTemps.map(async (t, idx) => {
+  // 3 parallel runs across 3 different models (provider/architecture diversity).
+  const runPromises = RUN_CONFIGS.map(async (cfg) => {
     const { content, duration_ms } = await callGateway({
-      model: RUN_MODEL,
+      model: cfg.model,
       system: prompts.system,
       user: userPrompt,
-      temperature: t,
+      temperature: cfg.temperature,
     });
     return {
-      label: `run_${idx + 1}`,
-      model: RUN_MODEL,
+      label: cfg.label,
+      model: cfg.model,
       result: parseJson<ReconResult>(content),
       duration_ms,
     };
@@ -167,7 +183,7 @@ export async function runReconciliation(input: RunReconciliationInput): Promise<
   const consensusResp = await callGateway({
     model: CONSENSUS_MODEL,
     user: consensusUser,
-    temperature: 0.1,
+    temperature: CONSENSUS_TEMPERATURE,
   });
   const consensus = {
     model: CONSENSUS_MODEL,
