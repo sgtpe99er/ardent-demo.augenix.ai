@@ -60,7 +60,7 @@ export function DashboardLayoutClient({ children, businessName, userEmail, imper
   const header = (
     <div className='sticky top-0 z-50'>
       <div
-        className='absolute inset-0 bg-surface/80 backdrop-blur-md dark:bg-black/80'
+        className='absolute inset-0 bg-surface/95 backdrop-blur-xl dark:bg-black/95'
         style={{ left: 'calc(-50vw + 50%)', width: '100vw' }}
       />
       <div className='relative'>
@@ -78,7 +78,7 @@ export function DashboardLayoutClient({ children, businessName, userEmail, imper
                 priority
                 className='h-9 w-auto object-contain'
               />
-              <span className='font-semibold text-lg ml-1 relative bottom-0.5'>AI</span>
+              <span className='font-semibold text-xl -ml-2 relative top-[1.25px]'>AI</span>
             </Link>
           </div>
           <div className='flex items-center gap-2 pr-4 lg:pr-8'>

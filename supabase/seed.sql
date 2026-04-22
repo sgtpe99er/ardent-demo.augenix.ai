@@ -68,11 +68,11 @@ INSERT INTO aa_demo_invoices (vendor_id, invoice_number, lk_code, amount, invoic
 
 -- 4. Mock Vendor Statements (one per vendor with discrepancy notes in text for AI)
 INSERT INTO aa_demo_statements (vendor_id, statement_period_start, statement_period_end, total_amount, statement_text) VALUES
-(1, '2026-04-01', '2026-04-30', 12494.75, 'Statement for Parts Supplier A - Period Apr 2026. Total Due: 12494.75. Invoices: PSA-2026-0415:1247.50, PSA-2026-0418:875.00, PSA-2026-0420:2999.75 (note tax adjustment), PSA-2026-0422:1590.25, PSA-2026-0425:2890.00.'),
-(2, '2026-04-01', '2026-04-30', 14450.75, 'Statement for Paint Vendor B. Total Due: 14450.75. Invoices: PVB-2026-0405:4520, PVB-2026-0412:3180.75, PVB-2026-0419:6750. Credit applied: -1850.00 (return).'),
-(3, '2026-04-01', '2026-04-30', 3030.50, 'Statement for Tool Vendor C. Total Due: 3030.50. Invoices: TVC-2026-0410:895.00 (listed once), TVC-2026-0421:1240.50.'),
-(4, '2026-04-01', '2026-04-30', 5005.00, 'Statement for Glass & Mirror D. Total Due: 5005.00. Invoices: GMD-2026-0408:2150, GMD-2026-0416:1875, GMD-2026-0423:980 (should be under LK-004).'),
-(5, '2026-04-01', '2026-04-30', 5700.00, 'Statement for Equipment Lease E. Total Due: 5700.00. Invoices: ELE-2026-0401:2850, ELE-2026-0415:2850. Perfect match.');
+(1, '2026-04-01', '2026-04-30', 12494.75, E'Statement for Parts Supplier A\nPeriod: Apr 2026\nTotal Due: 12,494.75\n\nInvoices:\n  PSA-2026-0415    1,247.50\n  PSA-2026-0418      875.00\n  PSA-2026-0420    2,999.75    (note tax adjustment)\n  PSA-2026-0422    1,590.25\n  PSA-2026-0425    2,890.00'),
+(2, '2026-04-01', '2026-04-30', 14450.75, E'Statement for Paint Vendor B\nPeriod: Apr 2026\nTotal Due: 14,450.75\n\nInvoices:\n  PVB-2026-0405    4,520.00\n  PVB-2026-0412    3,180.75\n  PVB-2026-0419    6,750.00\n\nCredits:\n  Credit applied  -1,850.00    (return)'),
+(3, '2026-04-01', '2026-04-30', 3030.50, E'Statement for Tool Vendor C\nPeriod: Apr 2026\nTotal Due: 3,030.50\n\nInvoices:\n  TVC-2026-0410      895.00    (listed once)\n  TVC-2026-0421    1,240.50'),
+(4, '2026-04-01', '2026-04-30', 5005.00, E'Statement for Glass & Mirror D\nPeriod: Apr 2026\nTotal Due: 5,005.00\n\nInvoices:\n  GMD-2026-0408    2,150.00\n  GMD-2026-0416    1,875.00\n  GMD-2026-0423      980.00    (should be under LK-004)'),
+(5, '2026-04-01', '2026-04-30', 5700.00, E'Statement for Equipment Lease E\nPeriod: Apr 2026\nTotal Due: 5,700.00\n\nInvoices:\n  ELE-2026-0401    2,850.00\n  ELE-2026-0415    2,850.00\n\nPerfect match.');
 
 -- 5. Create one pending reconciliation batch for immediate testing
 INSERT INTO aa_demo_reconciliation_batches (vendor_id, period_start, period_end, status)

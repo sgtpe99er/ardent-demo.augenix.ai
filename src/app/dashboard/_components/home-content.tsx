@@ -1,12 +1,17 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import {
   IoAlertCircle,
   IoCheckmarkCircle,
   IoHelpCircleOutline,
+  IoRefresh,
   IoTimeOutline,
 } from 'react-icons/io5';
+
+import { useToast } from '@/components/ui/use-toast';
 
 interface Batch {
   id: number;
@@ -74,19 +79,52 @@ export function HomeContent({ userEmail, batches }: HomeContentProps) {
   const pending = batches.filter((b) => b.status === 'pending' || b.status === 'running');
   const done = batches.filter((b) => b.status === 'complete' || b.status === 'error');
 
+  const router = useRouter();
+  const { toast } = useToast();
+  const [resetting, setResetting] = useState(false);
+
+  async function handleReset() {
+    if (!window.confirm('Reset all reconciliation batches back to pending? This clears all AI runs and audit logs from the demo.')) return;
+    setResetting(true);
+    try {
+      const res = await fetch('/api/reconcile/reset', { method: 'POST' });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(err.error ?? `HTTP ${res.status}`);
+      }
+      toast({ description: 'Demo data reset. All batches are pending again.' });
+      router.refresh();
+    } catch (err) {
+      toast({ variant: 'destructive', description: `Reset failed: ${(err as Error).message}` });
+    } finally {
+      setResetting(false);
+    }
+  }
+
   return (
     <div className='py-2 lg:py-3'>
       <div className='flex flex-wrap items-start justify-between gap-4'>
         <h1 className='font-serif text-3xl font-normal leading-[1.05] tracking-tight text-on-surface dark:text-white lg:text-5xl'>
           Vendor Statement Reconciliation
         </h1>
-        <Link
-          href='/dashboard/help'
-          className='inline-flex items-center gap-1.5 rounded-sm border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-on-surface transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:hover:bg-zinc-900'
-        >
-          <IoHelpCircleOutline className='h-4 w-4' />
-          How it works
-        </Link>
+        <div className='flex items-center gap-2'>
+          <button
+            type='button'
+            onClick={handleReset}
+            disabled={resetting}
+            className='inline-flex items-center gap-1.5 rounded-sm border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-on-surface transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:hover:bg-zinc-900'
+          >
+            <IoRefresh className={resetting ? 'h-4 w-4 animate-spin' : 'h-4 w-4'} />
+            {resetting ? 'Resetting…' : 'Reset demo data'}
+          </button>
+          <Link
+            href='/dashboard/help'
+            className='inline-flex items-center gap-1.5 rounded-sm border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium text-on-surface transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:hover:bg-zinc-900'
+          >
+            <IoHelpCircleOutline className='h-4 w-4' />
+            How it works
+          </Link>
+        </div>
       </div>
       <p className='mt-4 max-w-2xl text-sm leading-relaxed text-on-surface-variant dark:text-neutral-400'>
         Select a vendor statement below to run the three-agent consensus reconciliation against
