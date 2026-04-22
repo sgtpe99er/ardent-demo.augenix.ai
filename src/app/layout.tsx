@@ -53,27 +53,11 @@ export default function RootLayout({ children }: PropsWithChildren) {
       </head>
       <body className={cn('font-sans antialiased', montserrat.variable, montserratAlternates.variable, poppins.variable)}>
         <ThemeInitScript />
-        <div className='m-auto flex h-full max-w-[1440px] flex-col px-4'>
-          <AppBar />
-          <main className='relative flex-1'>
-            <div className='relative h-full'>{children}</div>
-          </main>
-        </div>
+        {children}
         <Toaster />
         <Analytics />
       </body>
     </html>
-  );
-}
-
-async function AppBar() {
-  return (
-    <ConditionalHeader>
-      <header className='flex items-center justify-between py-8'>
-        <Logo />
-        <Navigation />
-      </header>
-    </ConditionalHeader>
   );
 }
 
