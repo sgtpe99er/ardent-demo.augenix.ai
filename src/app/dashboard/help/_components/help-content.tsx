@@ -3,10 +3,15 @@
 import Link from 'next/link';
 import {
   IoArrowBack,
+  IoCardOutline,
   IoCheckmarkCircle,
+  IoCloudUploadOutline,
+  IoCreateOutline,
   IoDocumentTextOutline,
   IoDownloadOutline,
   IoGitMergeOutline,
+  IoLockClosed,
+  IoLockOpenOutline,
   IoPlayCircle,
   IoRefresh,
   IoShieldCheckmarkOutline,
@@ -71,56 +76,137 @@ export function HelpContent() {
             n={3}
             title='Fourth agent audits the three'
             icon={<IoGitMergeOutline />}
-            body='A fourth "consensus auditor" agent receives all three JSON outputs and produces the final answer. Rules are strict: majority vote for disagreements, the most conservative option when tied, averaged confidence, and any line below 85% confidence is automatically escalated to "Needs Review".'
+            body='A fourth "consensus auditor" agent receives all three JSON outputs and produces the final answer. Rules are strict: majority vote for disagreements, the most conservative option when tied, averaged confidence, and any line below 85% confidence is automatically escalated to Flagged.'
           />
           <Step
             n={4}
-            title='Everything is written to an audit log'
-            icon={<IoShieldCheckmarkOutline />}
-            body='All three individual runs and the final consensus are stored in the database with timestamps, model names, and durations. You can open the "Show audit log" toggle on any batch to see exactly what each agent said.'
+            title='Batch lands in "Needs Review"'
+            icon={<IoCheckmarkCircle />}
+            body='Reconciliation does not auto-finalize. The batch moves to "Needs Review" so the Office Manager can inspect every flagged row. Green rows matched cleanly. Amber rows carry a human-readable explanation (e.g. "Amount differs by $247 — possible tax adjustment") and a confidence score.'
           />
           <Step
             n={5}
-            title='You review, re-run, or export'
-            icon={<IoCheckmarkCircle />}
-            body='Green rows matched cleanly. Amber rows are flagged with a human-readable explanation (e.g. "Amount differs by $247 — possible tax adjustment"). You can re-run a single line with the "Re-run AI" button or export the full consensus result to CSV.'
+            title='Override or re-run as needed'
+            icon={<IoCreateOutline />}
+            body='Click "Re-run AI" on any row to re-execute the full 3-agent consensus for just that invoice. Or click "Override" to change a flagged row to matched (or vice versa), rewrite the reasoning, and attach a note. Every override is stored with before/after values and appears in the edit history.'
+          />
+          <Step
+            n={6}
+            title='Finalize the batch'
+            icon={<IoLockClosed />}
+            body='When you are satisfied, click the emerald "Finalize batch" button. A summary modal shows match rate, matched / flagged counts, human overrides, and net variance, with an "I have reviewed all oddities" checkbox that gates the action. Finalizing locks the batch and flips every invoice in the period to ready-to-pay.'
+          />
+          <Step
+            n={7}
+            title='Sync to Nexsyis & hand off to payments'
+            icon={<IoCloudUploadOutline />}
+            body='After finalizing, use "Sync to Nexsyis" to push the reconciled batch back (locks the statement, applies adjustments, links imaging documents — currently simulated with a mock transaction id) and "Start check run" to hand the approved invoices to the payment processing module (mock preview today). Need to make more edits? Un-finalize to re-open the batch.'
+          />
+          <Step
+            n={8}
+            title='Every action is in the edit history'
+            icon={<IoShieldCheckmarkOutline />}
+            body='All three AI runs, the consensus, every human override, and every lifecycle event (Finalize, Un-finalize, Nexsyis sync) are stored in the database with timestamps, model names, durations, and user emails. Toggle "Show edit history" on any batch to see the complete chronology.'
+          />
+        </ol>
+      </section>
+
+      {/* LIFECYCLE */}
+      <section className='mt-12 rounded-sm border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950 lg:p-8'>
+        <h2 className='font-serif text-2xl text-on-surface dark:text-white'>
+          The lifecycle of a batch
+        </h2>
+        <p className='mt-3 max-w-3xl text-sm leading-relaxed text-on-surface-variant dark:text-neutral-400'>
+          Every vendor statement moves through five clearly-separated states. Nothing happens
+          automatically after reconciliation — a deliberate human action is always required to
+          finalize and to push data back to Nexsyis.
+        </p>
+        <ol className='mt-5 space-y-2 text-sm'>
+          <LifecycleRow code='pending' label='Pending' body='Seeded or reset. No AI runs yet.' />
+          <LifecycleRow code='running' label='Running' body='Three agents executing in parallel; consensus pending.' />
+          <LifecycleRow
+            code='needs_review'
+            label='Needs Review'
+            body='Results ready. Office Manager reviews flagged rows, re-runs lines, and applies overrides.'
+          />
+          <LifecycleRow
+            code='complete'
+            label='Complete · Finalized'
+            body='Locked. Invoices marked ready-to-pay. Optional Sync to Nexsyis and Start check run become available.'
+            emerald
+          />
+          <LifecycleRow
+            code='needs_review'
+            label='Un-finalized'
+            body='Reverted from Complete. Invoices returned to unpaid. Batch is editable again.'
+            amber
           />
         </ol>
       </section>
 
       {/* HOW TO USE */}
       <section className='mt-12'>
-        <h2 className='font-serif text-2xl text-on-surface dark:text-white'>How to use the page</h2>
+        <h2 className='font-serif text-2xl text-on-surface dark:text-white'>Every button on the reconcile page</h2>
         <div className='mt-4 grid gap-4 md:grid-cols-2'>
           <Tile
             icon={<IoDocumentTextOutline />}
-            title='1 · Pick a statement'
-            body='From the home screen, click the vendor card under "Pending statements".'
+            title='Pick a statement'
+            body='From the home screen, click a vendor card. You can also select multiple vendors and hit "Run Batch Reconciliation" to sweep them sequentially.'
           />
           <Tile
             icon={<IoPlayCircle />}
-            title='2 · Run reconciliation'
-            body='Click the black "Run reconciliation" button in the top right. The three agents will stream through in ~15 seconds.'
+            title='Run reconciliation'
+            body='Black button, top right. The three agents stream through in ~15 seconds; a live step list shows each phase.'
           />
           <Tile
             icon={<IoCheckmarkCircle />}
-            title='3 · Review the results'
-            body='Matched lines are green. Flagged lines show the oddity (amount mismatch, missing credit, duplicate, wrong LK) with a confidence bar.'
+            title='Review the results'
+            body='Matched rows are green. Flagged rows show the oddity (amount mismatch, missing credit, duplicate, wrong LK code) with a confidence bar.'
           />
           <Tile
             icon={<IoRefresh />}
-            title='4 · Re-run a single line'
+            title='Re-run a single line'
             body='Not convinced by a flag? Click "Re-run AI" on any row to re-execute the full 3-agent consensus for just that invoice.'
           />
           <Tile
+            icon={<IoCreateOutline />}
+            title='Override a row'
+            body='Click "Override" on any row to change status (matched ↔ flagged), rewrite the reasoning, and add a note. Before/after values are kept forever in the audit trail.'
+          />
+          <Tile
+            icon={<IoLockClosed />}
+            title='Finalize the batch'
+            body='Emerald button. Opens a summary modal (match rate, flags, overrides, net variance, remaining warnings) with an "I have reviewed" checkbox gate. Locks the batch; flips invoices to ready-to-pay.'
+          />
+          <Tile
+            icon={<IoCloudUploadOutline />}
+            title='Sync to Nexsyis'
+            body='After finalize, push the approved batch to Nexsyis — locks the statement, applies adjustments, links imaging. Demo mode generates a mock transaction id (real integration coming).'
+          />
+          <Tile
+            icon={<IoCardOutline />}
+            title='Start check run'
+            body='After finalize, preview the mock check run (sequential check numbers, amounts, queued status) that would be handed off to Payment Processing.'
+          />
+          <Tile
+            icon={<IoLockOpenOutline />}
+            title='Un-finalize batch'
+            body='Need to make more edits? Un-finalize reverts the batch to Needs Review, flips invoices back to unpaid, and clears any Nexsyis sync id.'
+          />
+          <Tile
             icon={<IoShieldCheckmarkOutline />}
-            title='5 · Open the audit log'
-            body='Toggle "Show audit log" to see each agent&apos;s raw JSON — great for demonstrating transparency to partners.'
+            title='Show edit history'
+            body='Complete chronology of the batch — AI attempts, every human override (with before/after diff and note), and every lifecycle event (Finalize / Un-finalize / Sync to Nexsyis). Great for proving transparency to auditors.'
           />
           <Tile
             icon={<IoDownloadOutline />}
-            title='6 · Export to CSV'
-            body='Hit "Export CSV" to hand the final reconciliation to your accountant or import it into your AP workflow.'
+            title='Export to CSV'
+            body='Hand the final reconciliation to your accountant or drop it into your AP workflow.'
+          />
+          <Tile
+            icon={<IoRefresh />}
+            title='Reset demo data'
+            body='From the home page, clears all reconciliation state and returns every batch to Pending. Safe to run any time.'
           />
         </div>
       </section>
@@ -158,7 +244,7 @@ export function HelpContent() {
 function PipelineDiagram() {
   return (
     <svg
-      viewBox='0 0 640 1100'
+      viewBox='0 0 640 1580'
       className='h-auto w-full max-w-[560px] mx-auto text-on-surface dark:text-white'
       role='img'
       aria-label='Reconciliation pipeline diagram'
@@ -230,50 +316,124 @@ function PipelineDiagram() {
         <text x='320' y='684' textAnchor='middle' className='fill-white dark:fill-zinc-900 text-[15px]' opacity='0.9'>Force flag if &lt; 85% confidence</text>
       </g>
 
-      {/* Arrow Consensus → Output */}
+      {/* Arrow Consensus → Needs Review */}
       <line x1='320' y1='710' x2='320' y2='748' stroke='currentColor' strokeWidth='1.5' opacity='0.5' markerEnd='url(#arrow)' />
 
-      {/* Output box */}
+      {/* Needs Review box */}
       <g>
         <rect
-          x='180' y='750' width='280' height='130' rx='4'
+          x='180' y='750' width='280' height='140' rx='4'
           className='fill-white stroke-zinc-400 dark:fill-zinc-900 dark:stroke-zinc-600'
           strokeWidth='1.5'
         />
-        <text x='320' y='786' textAnchor='middle' className='fill-current font-serif text-[20px]' fontStyle='italic'>Results</text>
-        <text x='320' y='816' textAnchor='middle' className='fill-current text-[15px]' opacity='0.8'>Matches + Flags</text>
-        <text x='320' y='840' textAnchor='middle' className='fill-current text-[15px]' opacity='0.8'>Confidence + Reasoning</text>
-        <text x='320' y='864' textAnchor='middle' className='fill-current text-[15px]' opacity='0.8'>Audit trail</text>
+        <text x='320' y='786' textAnchor='middle' className='fill-current font-serif text-[20px]' fontStyle='italic'>Needs Review</text>
+        <text x='320' y='816' textAnchor='middle' className='fill-current text-[15px]' opacity='0.8'>Office Manager reviews</text>
+        <text x='320' y='840' textAnchor='middle' className='fill-current text-[15px]' opacity='0.8'>Matches + flagged rows</text>
+        <text x='320' y='864' textAnchor='middle' className='fill-current text-[15px]' opacity='0.8'>Confidence + reasoning</text>
       </g>
 
-      {/* Arrow Output → Nexsyis push */}
-      <line x1='320' y1='880' x2='320' y2='918' stroke='currentColor' strokeWidth='1.5' opacity='0.5' markerEnd='url(#arrow)' />
+      {/* Override loop — curved arrow going out right and back into Needs Review */}
+      <path
+        d='M 460 810 C 560 810, 560 870, 460 870'
+        fill='none' stroke='currentColor' strokeWidth='1.2' strokeDasharray='4 3' opacity='0.55'
+        markerEnd='url(#arrow)'
+      />
+      <text x='560' y='845' textAnchor='middle' className='fill-current text-[12px]' opacity='0.7'>Override</text>
+      <text x='560' y='860' textAnchor='middle' className='fill-current text-[11px]' opacity='0.5'>or Re-run</text>
 
-      {/* Nexsyis push */}
+      {/* Arrow Needs Review → Finalize */}
+      <line x1='320' y1='890' x2='320' y2='928' stroke='currentColor' strokeWidth='1.5' opacity='0.5' markerEnd='url(#arrow)' />
+
+      {/* Finalize (emerald) */}
       <g>
         <rect
-          x='180' y='920' width='280' height='130' rx='4'
+          x='150' y='930' width='340' height='110' rx='4'
+          className='fill-emerald-600 stroke-emerald-700 dark:fill-emerald-600 dark:stroke-emerald-500'
+          strokeWidth='1.5'
+        />
+        <text x='320' y='968' textAnchor='middle' className='fill-white font-serif text-[20px]' fontStyle='italic'>Finalize batch</text>
+        <text x='320' y='994' textAnchor='middle' className='fill-white text-[14px]' opacity='0.9'>Human action · checkbox gate</text>
+        <text x='320' y='1016' textAnchor='middle' className='fill-white text-[14px]' opacity='0.9'>Locks batch · writes audit entry</text>
+      </g>
+
+      {/* Arrow Finalize → Invoices ready-to-pay */}
+      <line x1='320' y1='1040' x2='320' y2='1078' stroke='currentColor' strokeWidth='1.5' opacity='0.5' markerEnd='url(#arrow)' />
+
+      {/* Invoices ready-to-pay */}
+      <g>
+        <rect
+          x='180' y='1080' width='280' height='100' rx='4'
           className='fill-white stroke-zinc-400 dark:fill-zinc-900 dark:stroke-zinc-600'
           strokeWidth='1.5'
         />
-        <text x='320' y='958' textAnchor='middle' className='fill-current font-serif text-[20px]' fontStyle='italic'>Nexsyis</text>
-        <text x='320' y='990' textAnchor='middle' className='fill-current text-[15px]' opacity='0.8'>Post adjustments</text>
-        <text x='320' y='1012' textAnchor='middle' className='fill-current text-[15px]' opacity='0.8'>& close period</text>
+        <text x='320' y='1116' textAnchor='middle' className='fill-current font-serif text-[18px]' fontStyle='italic'>Invoices → ready-to-pay</text>
+        <text x='320' y='1146' textAnchor='middle' className='fill-current text-[13px]' opacity='0.75'>Nexsyis AP status flipped</text>
       </g>
 
-      {/* Audit log — side branch off Consensus */}
+      {/* Split arrows to Sync and Check-run */}
+      <line x1='320' y1='1180' x2='180' y2='1238' stroke='currentColor' strokeWidth='1.5' opacity='0.5' markerEnd='url(#arrow)' />
+      <line x1='320' y1='1180' x2='460' y2='1238' stroke='currentColor' strokeWidth='1.5' opacity='0.5' markerEnd='url(#arrow)' />
+
+      {/* Sync to Nexsyis (simulated) */}
+      <g>
+        <rect
+          x='20' y='1240' width='260' height='150' rx='4'
+          className='fill-white stroke-zinc-400 dark:fill-zinc-900 dark:stroke-zinc-600'
+          strokeWidth='1.5' strokeDasharray='5 3'
+        />
+        <text x='150' y='1278' textAnchor='middle' className='fill-current font-serif text-[18px]' fontStyle='italic'>Sync to Nexsyis</text>
+        <text x='150' y='1302' textAnchor='middle' className='fill-current text-[12px]' opacity='0.6'>(simulated today)</text>
+        <text x='150' y='1328' textAnchor='middle' className='fill-current text-[13px]' opacity='0.8'>Lock statement</text>
+        <text x='150' y='1348' textAnchor='middle' className='fill-current text-[13px]' opacity='0.8'>Post adjustments</text>
+        <text x='150' y='1368' textAnchor='middle' className='fill-current text-[13px]' opacity='0.8'>Return transaction id</text>
+      </g>
+
+      {/* Check run (simulated) */}
+      <g>
+        <rect
+          x='340' y='1240' width='280' height='150' rx='4'
+          className='fill-white stroke-zinc-400 dark:fill-zinc-900 dark:stroke-zinc-600'
+          strokeWidth='1.5' strokeDasharray='5 3'
+        />
+        <text x='480' y='1278' textAnchor='middle' className='fill-current font-serif text-[18px]' fontStyle='italic'>Start check run</text>
+        <text x='480' y='1302' textAnchor='middle' className='fill-current text-[12px]' opacity='0.6'>(simulated today)</text>
+        <text x='480' y='1328' textAnchor='middle' className='fill-current text-[13px]' opacity='0.8'>Hand off to</text>
+        <text x='480' y='1348' textAnchor='middle' className='fill-current text-[13px]' opacity='0.8'>Payment Processing</text>
+        <text x='480' y='1368' textAnchor='middle' className='fill-current text-[13px]' opacity='0.8'>ACH / check print</text>
+      </g>
+
+      {/* Un-finalize loop — curved arrow from right side of Finalize back up to Needs Review */}
+      <path
+        d='M 150 985 C 50 985, 50 820, 180 820'
+        fill='none' stroke='currentColor' strokeWidth='1.2' strokeDasharray='4 3' opacity='0.5'
+        markerEnd='url(#arrow)'
+      />
+      <text x='50' y='905' textAnchor='middle' className='fill-current text-[12px]' opacity='0.7'>Un-finalize</text>
+
+      {/* Edit history — side branch catching AI runs, overrides, and lifecycle events */}
       <line
         x1='490' y1='625' x2='540' y2='625'
         stroke='currentColor' strokeWidth='1.2' strokeDasharray='4 3' opacity='0.5'
         markerEnd='url(#arrow)'
       />
       <rect
-        x='540' y='600' width='100' height='50' rx='4'
+        x='540' y='595' width='100' height='60' rx='4'
         className='fill-zinc-100 stroke-zinc-300 dark:fill-zinc-900 dark:stroke-zinc-700'
         strokeWidth='1'
       />
-      <text x='590' y='624' textAnchor='middle' className='fill-current text-[13px]' opacity='0.85'>Audit log</text>
-      <text x='590' y='640' textAnchor='middle' className='fill-current text-[12px]' opacity='0.6'>every run</text>
+      <text x='590' y='618' textAnchor='middle' className='fill-current text-[12px]' opacity='0.85'>Edit history</text>
+      <text x='590' y='634' textAnchor='middle' className='fill-current text-[11px]' opacity='0.55'>AI · overrides</text>
+      <text x='590' y='648' textAnchor='middle' className='fill-current text-[11px]' opacity='0.55'>lifecycle events</text>
+
+      {/* Also feed overrides and finalize events into edit history (dashed) */}
+      <path
+        d='M 460 820 C 520 820, 530 700, 540 650'
+        fill='none' stroke='currentColor' strokeWidth='0.8' strokeDasharray='3 3' opacity='0.3'
+      />
+      <path
+        d='M 490 985 C 540 950, 545 800, 545 655'
+        fill='none' stroke='currentColor' strokeWidth='0.8' strokeDasharray='3 3' opacity='0.3'
+      />
     </svg>
   );
 }
@@ -352,6 +512,35 @@ function Step({
           {body}
         </p>
       </div>
+    </li>
+  );
+}
+
+function LifecycleRow({
+  code,
+  label,
+  body,
+  emerald,
+  amber,
+}: {
+  code: string;
+  label: string;
+  body: string;
+  emerald?: boolean;
+  amber?: boolean;
+}) {
+  const pill = emerald
+    ? 'bg-emerald-600 text-white'
+    : amber
+    ? 'bg-amber-500 text-white'
+    : 'bg-zinc-200 text-on-surface dark:bg-zinc-800 dark:text-white';
+  return (
+    <li className='flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t border-zinc-100 py-2 first:border-t-0 dark:border-zinc-900'>
+      <span className={'rounded-full px-2 py-0.5 font-mono text-[10px] font-medium ' + pill}>
+        {code}
+      </span>
+      <span className='font-serif text-base text-on-surface dark:text-white'>{label}</span>
+      <span className='text-xs text-on-surface-variant dark:text-neutral-400'>{body}</span>
     </li>
   );
 }
