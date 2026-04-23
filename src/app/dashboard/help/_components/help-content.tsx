@@ -244,8 +244,8 @@ export function HelpContent() {
 function PipelineDiagram() {
   return (
     <svg
-      viewBox='0 0 640 1580'
-      className='h-auto w-full max-w-[560px] mx-auto text-on-surface dark:text-white'
+      viewBox='-100 0 980 1580'
+      className='h-auto w-full max-w-[760px] mx-auto text-on-surface dark:text-white'
       role='img'
       aria-label='Reconciliation pipeline diagram'
     >
@@ -334,12 +334,13 @@ function PipelineDiagram() {
 
       {/* Override loop — curved arrow going out right and back into Needs Review */}
       <path
-        d='M 460 810 C 560 810, 560 870, 460 870'
+        d='M 460 810 C 640 810, 640 870, 460 870'
         fill='none' stroke='currentColor' strokeWidth='1.2' strokeDasharray='4 3' opacity='0.55'
         markerEnd='url(#arrow)'
       />
-      <text x='560' y='845' textAnchor='middle' className='fill-current text-[12px]' opacity='0.7'>Override</text>
-      <text x='560' y='860' textAnchor='middle' className='fill-current text-[11px]' opacity='0.5'>or Re-run</text>
+      {/* Labels sit just above the loop's top curve so the dashed path does not cut through the text */}
+      <text x='560' y='788' textAnchor='middle' className='fill-current font-serif text-[20px]' fontStyle='italic' opacity='0.8'>Override</text>
+      <text x='560' y='806' textAnchor='middle' className='fill-current text-[12px]' opacity='0.6'>or Re-run</text>
 
       {/* Arrow Needs Review → Finalize */}
       <line x1='320' y1='890' x2='320' y2='928' stroke='currentColor' strokeWidth='1.5' opacity='0.5' markerEnd='url(#arrow)' />
@@ -404,35 +405,33 @@ function PipelineDiagram() {
 
       {/* Un-finalize loop — curved arrow from right side of Finalize back up to Needs Review */}
       <path
-        d='M 150 985 C 50 985, 50 820, 180 820'
+        d='M 150 985 C 20 985, 20 820, 180 820'
         fill='none' stroke='currentColor' strokeWidth='1.2' strokeDasharray='4 3' opacity='0.5'
         markerEnd='url(#arrow)'
       />
-      <text x='50' y='905' textAnchor='middle' className='fill-current text-[12px]' opacity='0.7'>Un-finalize</text>
+      {/* Label sits to the left of the dashed loop, vertically centred in the gap between Needs Review and Finalize */}
+      <text x='-25' y='912' textAnchor='middle' className='fill-current font-serif text-[20px]' fontStyle='italic' opacity='0.8'>Un-finalize</text>
 
-      {/* Edit history — side branch catching AI runs, overrides, and lifecycle events */}
-      <line
-        x1='490' y1='625' x2='540' y2='625'
-        stroke='currentColor' strokeWidth='1.2' strokeDasharray='4 3' opacity='0.5'
-        markerEnd='url(#arrow)'
-      />
+      {/* Edit history — positioned to the right, clear of the Override / Re-run loop */}
       <rect
-        x='540' y='595' width='100' height='60' rx='4'
+        x='690' y='790' width='180' height='120' rx='4'
         className='fill-zinc-100 stroke-zinc-300 dark:fill-zinc-900 dark:stroke-zinc-700'
         strokeWidth='1'
       />
-      <text x='590' y='618' textAnchor='middle' className='fill-current text-[12px]' opacity='0.85'>Edit history</text>
-      <text x='590' y='634' textAnchor='middle' className='fill-current text-[11px]' opacity='0.55'>AI · overrides</text>
-      <text x='590' y='648' textAnchor='middle' className='fill-current text-[11px]' opacity='0.55'>lifecycle events</text>
+      <text x='780' y='828' textAnchor='middle' className='fill-current font-serif text-[20px]' fontStyle='italic' opacity='0.9'>Edit history</text>
+      <text x='780' y='860' textAnchor='middle' className='fill-current text-[13px]' opacity='0.7'>AI · overrides</text>
+      <text x='780' y='882' textAnchor='middle' className='fill-current text-[13px]' opacity='0.7'>lifecycle events</text>
 
-      {/* Also feed overrides and finalize events into edit history (dashed) */}
+      {/* Feeder arrows — AI consensus, overrides, and finalize events all flow into edit history */}
       <path
-        d='M 460 820 C 520 820, 530 700, 540 650'
-        fill='none' stroke='currentColor' strokeWidth='0.8' strokeDasharray='3 3' opacity='0.3'
+        d='M 490 625 C 700 625, 780 700, 780 790'
+        fill='none' stroke='currentColor' strokeWidth='1.2' strokeDasharray='4 3' opacity='0.5'
+        markerEnd='url(#arrow)'
       />
       <path
-        d='M 490 985 C 540 950, 545 800, 545 655'
-        fill='none' stroke='currentColor' strokeWidth='0.8' strokeDasharray='3 3' opacity='0.3'
+        d='M 490 985 C 700 985, 780 950, 780 910'
+        fill='none' stroke='currentColor' strokeWidth='0.8' strokeDasharray='3 3' opacity='0.35'
+        markerEnd='url(#arrow)'
       />
     </svg>
   );
