@@ -37,18 +37,18 @@ export async function middleware(request: NextRequest) {
             request,
           });
 
-          // In production, set cookies on the parent domain so subdomain sites
-          // (*.freewebsite.deal) can send auth cookies to the main app for the Preview Bar.
-          // SameSite=None; Secure is required because the preview bar makes cross-origin
-          // fetch requests from subdomain sites to the main domain.
-          const isProduction = process.env.NODE_ENV === 'production';
-          const cookieDomain = isProduction ? '.freewebsite.deal' : undefined;
+          // Optionally set cookies on a parent domain so subdomains can share
+          // auth (e.g. for a cross-origin preview bar). Configure via
+          // NEXT_PUBLIC_AUTH_COOKIE_DOMAIN (e.g. ".example.com"). When unset,
+          // cookies are host-only, which is the correct default.
+          const cookieDomain = process.env.NEXT_PUBLIC_AUTH_COOKIE_DOMAIN;
+          const crossSite = Boolean(cookieDomain);
 
           for (const { name, value, options } of cookiesToSet) {
             supabaseResponse.cookies.set(name, value, {
               ...(options as Record<string, unknown>),
               ...(cookieDomain ? { domain: cookieDomain } : {}),
-              ...(isProduction ? { sameSite: 'none' as const, secure: true } : {}),
+              ...(crossSite ? { sameSite: 'none' as const, secure: true } : {}),
             });
           }
         },
